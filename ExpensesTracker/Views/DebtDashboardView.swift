@@ -12,7 +12,7 @@ struct DebtDashboardView: View {
                 
                 debtsSection
             }
-            .navigationTitle("Debt Management")
+            .navigationTitle(String(localized: "debt_management"))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddDebt = true }) {
@@ -30,7 +30,7 @@ struct DebtDashboardView: View {
         Section {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("Total Debt")
+                    Text(String(localized: "total_debt"))
                         .font(.subheadline)
                     Spacer()
                     Text(viewModel.totalDebtAmount.formatted(.currency(code: "USD")))
@@ -38,7 +38,7 @@ struct DebtDashboardView: View {
                 }
                 
                 HStack {
-                    Text("Active Debts")
+                    Text(String(localized: "active_debts"))
                         .font(.subheadline)
                     Spacer()
                     Text("\(viewModel.activeDebtsCount)")
@@ -46,7 +46,7 @@ struct DebtDashboardView: View {
                 }
                 
                 HStack {
-                    Text("Upcoming Payments")
+                    Text(String(localized: "upcoming_payments"))
                         .font(.subheadline)
                     Spacer()
                     Text("\(viewModel.upcomingPaymentsCount)")

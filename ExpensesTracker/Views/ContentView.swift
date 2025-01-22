@@ -9,39 +9,48 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject var expenseViewModel: ExpenseViewModel
+    @StateObject private var languageManager = LanguageManager.shared
     @State private var showingBudgetAlert = false
     @State private var budgetAlertCategory: Category?
+    
+    // Esto fuerza a la vista a recrearse cuando cambia el idioma
+    @State private var languageUpdateTrigger = UUID()
     
     var body: some View {
         TabView {
             HomeView()
                 .environmentObject(expenseViewModel)
                 .tabItem {
-                    Label("Home", systemImage: "house.fill")
+                    Label(String(localized: "home"), systemImage: "house.fill")
                 }
             
             ExpensesView()
                 .environmentObject(expenseViewModel)
                 .tabItem {
-                    Label("Expenses", systemImage: "dollarsign.circle.fill")
+                    Label(String(localized: "expenses"), systemImage: "dollarsign.circle.fill")
                 }
             
             DebtDashboardView()
                 .tabItem {
-                    Label("Debts", systemImage: "creditcard.fill")
+                    Label(String(localized: "debts"), systemImage: "creditcard.fill")
                 }
             
             DashboardView()
                 .environmentObject(expenseViewModel)
                 .tabItem {
-                    Label("Dashboard", systemImage: "chart.pie.fill")
+                    Label(String(localized: "dashboard"), systemImage: "chart.pie.fill")
                 }
             
             SettingsView()
                 .environmentObject(expenseViewModel)
                 .tabItem {
-                    Label("Settings", systemImage: "gear")
+                    Label(String(localized: "settings"), systemImage: "gear")
                 }
+        }
+        .id(languageUpdateTrigger) // Esto fuerza la recreación de la vista
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("LanguageChanged"))) { _ in
+            // Actualizar el trigger para forzar la recreación de la vista
+            languageUpdateTrigger = UUID()
         }
         .onChange(of: expenseViewModel.expenses) { _ in
             checkBudgetAlerts()

@@ -9,9 +9,10 @@ import SwiftUI
 import FirebaseCore
 
 @main
-struct ExpensesTrackerApp: App {
+struct ExpenseTrackerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var expenseViewModel = ExpenseViewModel()
+    @StateObject private var languageManager = LanguageManager.shared
     
     init() {
         FirebaseApp.configure()
@@ -19,8 +20,10 @@ struct ExpensesTrackerApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(expenseViewModel: expenseViewModel)
+            ContentView(expenseViewModel: expenseViewModel) // Aquí se pasa la instancia
                 .environmentObject(expenseViewModel)
+                .environment(\.locale, .init(identifier: languageManager.currentLanguage.rawValue))
+                .id(languageManager.refreshID) // Force view refresh when language changes
         }
     }
 }

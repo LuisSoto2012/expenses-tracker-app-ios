@@ -6,15 +6,17 @@ struct SettingsView: View {
     @State private var showingCategorySheet = false
     @State private var showingExportSheet = false
     @State private var showingSignOutAlert = false
+    @StateObject private var languageManager = LanguageManager.shared
+    @State private var showingLanguageAlert = false
     
     var body: some View {
         NavigationView {
             List {
                 // Categories Section
-                Section("Categories") {
+                Section(String(localized: "categories")) {
                     Button(action: { showingCategorySheet = true }) {
                         HStack {
-                            Label("Manage Categories", systemImage: "tag")
+                            Label(String(localized: "manage_categories"), systemImage: "tag")
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.secondary)
@@ -23,46 +25,57 @@ struct SettingsView: View {
                 }
                 
                 // Budget Section
-                Section("Budget") {
+                Section(String(localized: "budget")) {
                     NavigationLink(destination: BudgetSettingsView().environmentObject(expenseViewModel)) {
-                        Label("Budget Settings", systemImage: "chart.bar")
+                        Label(String(localized: "budget_settings"), systemImage: "chart.bar")
                     }
                 }
                 
                 // Data Management
-                Section("Data") {
+                Section(String(localized: "data")) {
                     Button(action: { showingExportSheet = true }) {
-                        Label("Export Data", systemImage: "square.and.arrow.up")
+                        Label(String(localized: "export_data"), systemImage: "square.and.arrow.up")
                     }
                 }
                 
                 // Account Section
-                Section("Account") {
+                Section(String(localized: "account")) {
                     if let user = Auth.auth().currentUser {
                         HStack {
-                            Label("Email", systemImage: "envelope")
+                            Label(String(localized: "email"), systemImage: "envelope")
                             Spacer()
                             Text(user.email ?? "")
                                 .foregroundColor(.secondary)
                         }
                         
                         Button(role: .destructive, action: { showingSignOutAlert = true }) {
-                            Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                            Label(String(localized: "sign_out"), systemImage: "rectangle.portrait.and.arrow.right")
+                        }
+                    }
+                }
+                
+                // Language Section
+                Section(String(localized: "language")) {
+                    Picker(String(localized: "language"), selection: $languageManager.currentLanguage) {
+                        ForEach(LanguageManager.Language.allCases, id: \.self) { language in
+                            Text(language.displayName)
+                                .tag(language)
                         }
                     }
                 }
                 
                 // About Section
-                Section("About") {
+                Section(String(localized: "about")) {
                     HStack {
-                        Label("Version", systemImage: "info.circle")
+                        Label(String(localized: "version"), systemImage: "info.circle")
                         Spacer()
                         Text("1.0.0")
                             .foregroundColor(.secondary)
                     }
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle(String(localized: "settings"))
+            .id(languageManager.refreshID)
         }
         .sheet(isPresented: $showingCategorySheet) {
             CategoryManagementView()
@@ -74,7 +87,7 @@ struct SettingsView: View {
                 try? Auth.auth().signOut()
             }
         } message: {
-            Text("Are you sure you want to sign out?")
+            Text(String(localized: "sign_out_confirm_message"))
         }
     }
 }

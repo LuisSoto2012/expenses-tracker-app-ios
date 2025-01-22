@@ -29,17 +29,17 @@ struct BudgetSettingsView: View {
                 }
             }
             
-            Section("Debt Management") {
+            Section(String(localized: "debt_management")) {
                 NavigationLink(destination: DebtDashboardView()) {
                     HStack {
                         Image(systemName: "creditcard.fill")
                             .foregroundColor(.blue)
-                        Text("Manage Debts")
+                        Text(String(localized: "manage_debts"))
                     }
                 }
             }
         }
-        .navigationTitle("Budget Settings")
+        .navigationTitle(String(localized: "budget_settings"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
