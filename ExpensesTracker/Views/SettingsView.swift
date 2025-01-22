@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseAuth
+import SFSymbolsPicker
 
 struct SettingsView: View {
     @EnvironmentObject var expenseViewModel: ExpenseViewModel
@@ -169,6 +170,7 @@ struct CategoryFormView: View {
     @State private var name: String = ""
     @State private var color: String = ""
     @State private var icon: String = ""
+    @State private var isPickerPresented = false
     
     init(mode: Mode) {
         self.mode = mode
@@ -190,7 +192,15 @@ struct CategoryFormView: View {
                 ))
                 
                 // Icon picker would go here
-                TextField("Nombre del Icono (Símbolo SF)", text: $icon)
+                HStack {
+                    Text("Icono")
+                    Spacer()
+                    Image(systemName: icon)
+                        .font(.title2)
+                }
+                .onTapGesture {
+                    isPickerPresented.toggle()
+                }
             }
             .navigationTitle(title)
             .toolbar {
@@ -204,6 +214,11 @@ struct CategoryFormView: View {
                         dismiss()
                     }
                     .disabled(name.isEmpty || color.isEmpty || icon.isEmpty)
+                }
+            }
+            .sheet(isPresented: $isPickerPresented) {
+                SymbolsPicker(selection: $icon, title: "Elige un ícono", autoDismiss: true) {
+                    Image(systemName: "xmark.diamond.fill") // Icono de cierre
                 }
             }
         }
