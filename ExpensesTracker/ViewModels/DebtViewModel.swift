@@ -111,4 +111,21 @@ class DebtViewModel: ObservableObject {
             }
         }
     }
-} 
+    
+    func sortedDebts(by criteria: SortCriteria) -> [Debt] {
+        switch criteria {
+        case .creationDate:
+            return debts.sorted { $0.creationDate < $1.creationDate }
+        case .nextPaymentDate:
+            return debts.sorted { ($0.nextPaymentDate ?? .distantFuture) < ($1.nextPaymentDate ?? .distantFuture) }
+        case .progress:
+            return debts.sorted { $0.progress > $1.progress }
+        }
+    }
+}
+
+enum SortCriteria {
+    case nextPaymentDate
+    case progress
+    case creationDate
+}

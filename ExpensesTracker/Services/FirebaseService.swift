@@ -113,7 +113,7 @@ class FirebaseService: ObservableObject {
     // MARK: - Debt Management
     func observeDebts(completion: @escaping ([Debt]) -> Void) {
         let listener = db.collection("debts")
-            .order(by: "lastModified", descending: true)
+            .order(by: "creationDate", descending: true)
             .addSnapshotListener { snapshot, error in
                 if let error = error {
                     print("Error fetching debts: \(error)")
@@ -167,7 +167,8 @@ private extension Debt {
         var description: String?
         var sharedWithPartner: Bool
         var createdBy: String
-        var lastModified: Date
+        var creationDate: Date
+        var lastModified: Date?
         
         init(from debt: Debt) {
             self.id = debt.id
@@ -180,7 +181,8 @@ private extension Debt {
             self.description = debt.description
             self.sharedWithPartner = debt.sharedWithPartner
             self.createdBy = debt.createdBy
-            self.lastModified = debt.lastModified
+            self.lastModified = nil
+            self.creationDate = Date()
         }
         
         func toDebt() -> Debt {
@@ -196,6 +198,7 @@ private extension Debt {
             debt.status = status
             debt.installments = installments
             debt.createdBy = createdBy
+            debt.creationDate = creationDate
             debt.lastModified = lastModified
             return debt
         }

@@ -11,7 +11,11 @@ struct Debt: Identifiable, Codable {
     var description: String?
     var sharedWithPartner: Bool
     var createdBy: String
-    var lastModified: Date
+    var creationDate: Date
+    var lastModified: Date?
+    var nextPaymentDate: Date? {
+        installments.first(where: { !$0.isPaid })?.dueDate
+    }
     
     init(
         name: String,
@@ -29,8 +33,8 @@ struct Debt: Identifiable, Codable {
         self.description = description
         self.sharedWithPartner = sharedWithPartner
         self.createdBy = "" // Will be set when saving
-        self.lastModified = Date()
         self.installments = []
+        self.creationDate = Date()
         
         generateInstallments()
     }
@@ -73,6 +77,6 @@ struct Debt: Identifiable, Codable {
 }
 
 enum DebtStatus: String, Codable {
-    case pending = "Pending"
-    case paid = "Paid"
+    case pending = "Pendiente"
+    case paid = "Pagada"
 } 

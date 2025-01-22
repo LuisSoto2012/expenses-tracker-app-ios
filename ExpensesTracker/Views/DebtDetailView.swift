@@ -72,6 +72,12 @@ struct DebtDetailView: View {
                 Text("\(Int(debt.progress * 100))%")
             }
             
+            if let nextPaymentDate = debt.nextPaymentDate {
+                LabeledContent("Próximo Pago") {
+                    Text(nextPaymentDate, style: .date)
+                }
+            }
+            
             if let description = debt.description {
                 LabeledContent("Descripción") {
                     Text(description)
