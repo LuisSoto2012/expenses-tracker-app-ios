@@ -74,7 +74,7 @@ struct CategoryBudgetRow: View {
                     ProgressView(value: min(progress, 1.0))
                         .tint(progress > 1.0 ? .red : category.uiColor)
                         .overlay(alignment: .trailing) {
-                            Text("$\(budget.amount, specifier: "%.0f")")
+                            Text("S/. \(budget.amount, specifier: "%.0f")")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }

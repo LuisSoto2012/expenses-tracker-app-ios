@@ -33,7 +33,7 @@ struct DebtDashboardView: View {
                     Text("Deuda Total")
                         .font(.subheadline)
                     Spacer()
-                    Text(viewModel.totalDebtAmount.formatted(.currency(code: "USD")))
+                    Text(viewModel.totalDebtAmount.formatted(.currency(code: "PEN")))
                         .font(.headline)
                 }
                 
@@ -91,7 +91,7 @@ struct DebtRowView: View {
                 StatusBadge(status: debt.status)
             }
             
-            Text(debt.totalAmount.formatted(.currency(code: "USD")))
+            Text(debt.totalAmount.formatted(.currency(code: "PEN")))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
             

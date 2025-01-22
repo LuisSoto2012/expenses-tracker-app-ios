@@ -15,4 +15,11 @@ struct CurrencyFormatter {
         formatter.maximumFractionDigits = 2
         return formatter
     }
+    static var pen: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = "PEN"
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }
 }

@@ -4,7 +4,7 @@ struct AddExpenseView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var expenseViewModel: ExpenseViewModel
     
-    @State private var amount: String = ""
+    @State private var amount: Double = 0.0
     @State private var notes: String = ""
     @State private var date = Date()
     @State private var selectedCategoryId: UUID?
@@ -17,10 +17,10 @@ struct AddExpenseView: View {
             Form {
                 // Amount Section
                 Section {
-                    TextField("Monto", text: $amount)
+                    TextField("Monto", value: $amount, formatter: CurrencyFormatter.pen)
                         .keyboardType(.decimalPad)
                 } header: {
-                    Text("Monto")
+                    Text("Monto (S/.)")
                 }
                 
                 // Category Section
@@ -87,22 +87,16 @@ struct AddExpenseView: View {
     }
     
     private var isFormValid: Bool {
-        guard let amountDouble = Double(amount),
-              amountDouble > 0,
-              selectedCategoryId != nil else {
-            return false
-        }
-        return true
+        return amount > 0 && selectedCategoryId != nil
     }
     
     private func saveExpense() {
-        guard let amountDouble = Double(amount),
-              let categoryId = selectedCategoryId else {
+        guard let categoryId = selectedCategoryId else {
             return
         }
         
         let expense = Expense(
-            amount: amountDouble,
+            amount: amount,
             date: date,
             notes: notes.isEmpty ? nil : notes,
             categoryId: categoryId,

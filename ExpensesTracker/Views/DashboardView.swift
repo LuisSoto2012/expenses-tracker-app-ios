@@ -95,7 +95,7 @@ struct CategoryPieChart: View {
                     Text(item.0.name)
                         .font(.caption)
                     Spacer()
-                    Text("$\(item.1, specifier: "%.2f")")
+                    Text("S/. \(item.1, specifier: "%.2f")")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -132,7 +132,7 @@ struct CategoryBreakdownList: View {
                     
                     Spacer()
                     
-                    Text("$\(item.1, specifier: "%.2f")")
+                    Text("S/. \(item.1, specifier: "%.2f")")
                         .font(.subheadline)
                 }
             }
@@ -164,7 +164,7 @@ struct MonthlyTrendChart: View {
         }
         .chartYAxis {
             AxisMarks { value in
-                AxisValueLabel("$\(value.as(Double.self) ?? 0, specifier: "%.0f")")
+                AxisValueLabel("S/. \(value.as(Double.self) ?? 0, specifier: "%.0f")")
             }
         }
         .frame(height: 200)

@@ -57,11 +57,11 @@ struct DebtDetailView: View {
     private var debtInfoSection: some View {
         Section("Información de la Deuda") {
             LabeledContent("Monto Total") {
-               Text(debt.totalAmount.formatted(.currency(code: "USD")))
+               Text(debt.totalAmount.formatted(.currency(code: "PEN")))
            }
 
            LabeledContent("Restante") {
-               Text(debt.remainingAmount.formatted(.currency(code: "USD")))
+               Text(debt.remainingAmount.formatted(.currency(code: "PEN")))
            }
             
             LabeledContent("Estado") {
@@ -129,7 +129,7 @@ struct InstallmentRow: View {
                     Text("Monto")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text(installment.amount.formatted(.currency(code: "USD")))
+                    Text(installment.amount.formatted(.currency(code: "PEN")))
                 }
             }
             
@@ -140,7 +140,7 @@ struct InstallmentRow: View {
                         .foregroundColor(.secondary)
                     Spacer()
                     if let paidAmount = installment.paidAmount {
-                        Text(paidAmount.formatted(.currency(code: "USD")))
+                        Text(paidAmount.formatted(.currency(code: "PEN")))
                     }
                     if let paidDate = installment.paidDate {
                         Text("el \(paidDate.formatted(date: .abbreviated, time: .omitted))")
@@ -178,7 +178,7 @@ struct RegisterPaymentView: View {
                     Toggle("Especificar monto de pago", isOn: $showingAmountField)
                     
                     if showingAmountField {
-                        TextField("Monto", value: $amount, format: .currency(code: "USD"))
+                        TextField("Monto", value: $amount, format: .currency(code: "PEN"))
                             .keyboardType(.decimalPad)
                     }
                 } footer: {

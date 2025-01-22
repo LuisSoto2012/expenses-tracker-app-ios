@@ -13,7 +13,7 @@ struct HomeView: View {
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         
-                        Text("$\(expenseViewModel.totalMonthlyExpenses, specifier: "%.2f")")
+                        Text("S/. \(expenseViewModel.totalMonthlyExpenses, specifier: "%.2f")")
                             .font(.system(size: 34, weight: .bold))
                         
                         Divider()
@@ -77,7 +77,7 @@ struct BudgetProgressView: View {
                 Text(category.name)
                     .font(.subheadline)
                 Spacer()
-                Text("$\(budget.amount, specifier: "%.0f")")
+                Text("S/. \(budget.amount, specifier: "%.0f")")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

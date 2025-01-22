@@ -27,7 +27,7 @@ struct EditDebtView: View {
                 Section("Detalles de la Deuda") {
                     TextField("Nombre de la Deuda", text: $name)
                     
-                    TextField("Monto Total", value: $totalAmount, formatter: CurrencyFormatter.usd)
+                    TextField("Monto Total", value: $totalAmount, formatter: CurrencyFormatter.pen)
                         .keyboardType(.decimalPad)
                     
                     Stepper("Número de Cuotas: \(numberOfInstallments)", value: $numberOfInstallments, in: 1...36)

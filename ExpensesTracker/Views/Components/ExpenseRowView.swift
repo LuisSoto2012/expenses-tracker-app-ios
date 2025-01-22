@@ -57,7 +57,7 @@ struct ExpenseRowView: View {
             Spacer()
             
             // Amount
-            Text("$\(expense.amount, specifier: "%.2f")")
+            Text("S/. \(expense.amount, specifier: "%.2f")")
                 .font(.headline)
         }
         .padding()
