@@ -1,9 +1,13 @@
 import Foundation
 import FirebaseFirestore
+import FirebaseAuth
 
 class FirebaseService: ObservableObject {
+    static let shared = FirebaseService()
     private let db = Firestore.firestore()
     private var listeners: [ListenerRegistration] = []
+    
+    init() {} // Make initializer private for singleton pattern
     
     func syncExpenses(completion: @escaping ([Expense]) -> Void) {
         let listener = db.collection("expenses")
@@ -104,5 +108,96 @@ class FirebaseService: ObservableObject {
     func cleanup() {
         listeners.forEach { $0.remove() }
         listeners.removeAll()
+    }
+    
+    // MARK: - Debt Management
+    func observeDebts(completion: @escaping ([Debt]) -> Void) {
+        let listener = db.collection("debts")
+            .order(by: "lastModified", descending: true)
+            .addSnapshotListener { snapshot, error in
+                if let error = error {
+                    print("Error fetching debts: \(error)")
+                    return
+                }
+                
+                guard let documents = snapshot?.documents else {
+                    completion([])
+                    return
+                }
+                
+                let debts = documents.compactMap { document -> Debt? in
+                    guard let firebaseDebt = try? document.data(as: Debt.FirebaseDebt.self) else { return nil }
+                    return firebaseDebt.toDebt()
+                }
+                completion(debts)
+            }
+        listeners.append(listener)
+    }
+    
+    func addDebt(_ debt: Debt) async throws {
+        var newDebt = debt
+        newDebt.createdBy = Auth.auth().currentUser?.uid ?? ""
+        let firebaseDebt = Debt.FirebaseDebt(from: newDebt)
+        _ = try db.collection("debts").addDocument(from: firebaseDebt)
+    }
+    
+    func updateDebt(_ debt: Debt) async throws {
+        guard let id = debt.id else { return }
+        let firebaseDebt = Debt.FirebaseDebt(from: debt)
+        try db.collection("debts").document(id).setData(from: firebaseDebt)
+    }
+    
+    func deleteDebt(_ debt: Debt) async throws {
+        guard let id = debt.id else { return }
+        try await db.collection("debts").document(id).delete()
+    }
+}
+
+// Add this extension to handle Firebase-specific debt mapping
+private extension Debt {
+    // For Firebase storage
+    struct FirebaseDebt: Codable {
+        @DocumentID var id: String?
+        var name: String
+        var totalAmount: Double
+        var numberOfInstallments: Int
+        var startDate: Date
+        var status: DebtStatus
+        var installments: [DebtInstallment]
+        var description: String?
+        var sharedWithPartner: Bool
+        var createdBy: String
+        var lastModified: Date
+        
+        init(from debt: Debt) {
+            self.id = debt.id
+            self.name = debt.name
+            self.totalAmount = debt.totalAmount
+            self.numberOfInstallments = debt.numberOfInstallments
+            self.startDate = debt.startDate
+            self.status = debt.status
+            self.installments = debt.installments
+            self.description = debt.description
+            self.sharedWithPartner = debt.sharedWithPartner
+            self.createdBy = debt.createdBy
+            self.lastModified = debt.lastModified
+        }
+        
+        func toDebt() -> Debt {
+            var debt = Debt(
+                name: name,
+                totalAmount: totalAmount,
+                numberOfInstallments: numberOfInstallments,
+                startDate: startDate,
+                description: description,
+                sharedWithPartner: sharedWithPartner
+            )
+            debt.id = id
+            debt.status = status
+            debt.installments = installments
+            debt.createdBy = createdBy
+            debt.lastModified = lastModified
+            return debt
+        }
     }
 }

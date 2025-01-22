@@ -91,11 +91,9 @@ struct DebtRowView: View {
                 StatusBadge(status: debt.status)
             }
             
-            if let amount = debt.totalAmount {
-                Text(amount.formatted(.currency(code: "USD")))
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
+            Text(debt.totalAmount.formatted(.currency(code: "USD")))
+                .font(.subheadline)
+                .foregroundColor(.secondary)
             
             ProgressView(value: debt.progress)
                 .tint(debt.progress == 1 ? .green : .blue)

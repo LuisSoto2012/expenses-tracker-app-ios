@@ -5,6 +5,9 @@ struct DebtDetailView: View {
     @ObservedObject var viewModel: DebtViewModel
     @State private var showingPaymentSheet = false
     @State private var selectedInstallment: DebtInstallment?
+    @Environment(\.dismiss) private var dismiss
+    @State private var showingEditSheet = false
+    @State private var showingDeleteAlert = false
     
     var body: some View {
         List {
@@ -22,21 +25,44 @@ struct DebtDetailView: View {
                 )
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button(action: { showingEditSheet = true }) {
+                        Label("Edit Debt", systemImage: "pencil")
+                    }
+                    
+                    Button(role: .destructive, action: { showingDeleteAlert = true }) {
+                        Label("Delete Debt", systemImage: "trash")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            }
+        }
+        .alert("Delete Debt", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                viewModel.deleteDebt(debt)
+                dismiss()
+            }
+        } message: {
+            Text("Are you sure you want to delete this debt? This action cannot be undone.")
+        }
+        .sheet(isPresented: $showingEditSheet) {
+            EditDebtView(debt: debt, viewModel: viewModel)
+        }
     }
     
     private var debtInfoSection: some View {
         Section("Debt Information") {
-            if let amount = debt.totalAmount {
-                LabeledContent("Total Amount") {
-                    Text(amount.formatted(.currency(code: "USD")))
-                }
-                
-                if let remaining = debt.remainingAmount {
-                    LabeledContent("Remaining") {
-                        Text(remaining.formatted(.currency(code: "USD")))
-                    }
-                }
-            }
+            LabeledContent("Total Amount") {
+               Text(debt.totalAmount.formatted(.currency(code: "USD")))
+           }
+
+           LabeledContent("Remaining") {
+               Text(debt.remainingAmount.formatted(.currency(code: "USD")))
+           }
             
             LabeledContent("Status") {
                 StatusBadge(status: debt.status)
@@ -61,7 +87,7 @@ struct DebtDetailView: View {
     private var installmentsSection: some View {
         Section("Installments") {
             ForEach(debt.installments) { installment in
-                InstallmentRow(installment: installment)
+                InstallmentRow(installment: installment, debt: debt, viewModel: viewModel)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         selectedInstallment = installment
@@ -74,6 +100,8 @@ struct DebtDetailView: View {
 
 struct InstallmentRow: View {
     let installment: DebtInstallment
+    let debt: Debt
+    @ObservedObject var viewModel: DebtViewModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -97,13 +125,11 @@ struct InstallmentRow: View {
                 
                 Spacer()
                 
-                if let amount = installment.amount {
-                    VStack(alignment: .trailing) {
-                        Text("Amount")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text(amount.formatted(.currency(code: "USD")))
-                    }
+                VStack(alignment: .trailing) {
+                    Text("Amount")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text(installment.amount.formatted(.currency(code: "USD")))
                 }
             }
             
@@ -118,6 +144,15 @@ struct InstallmentRow: View {
                     }
                     if let paidDate = installment.paidDate {
                         Text("on \(paidDate.formatted(date: .abbreviated, time: .omitted))")
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        viewModel.undoPayment(for: debt, installmentNumber: installment.number)
+                    }) {
+                        Image(systemName: "arrow.uturn.backward.circle")
+                            .foregroundColor(.blue)
                     }
                 }
                 .foregroundColor(.green)

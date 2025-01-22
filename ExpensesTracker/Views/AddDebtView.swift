@@ -5,7 +5,7 @@ struct AddDebtView: View {
     @ObservedObject var viewModel: DebtViewModel
     
     @State private var name = ""
-    @State private var totalAmount: Double?
+    @State private var totalAmount: Double = 0.0
     @State private var numberOfInstallments = 12
     @State private var startDate = Date()
     @State private var description = ""
@@ -17,7 +17,7 @@ struct AddDebtView: View {
                 Section("Debt Details") {
                     TextField("Debt Name", text: $name)
                     
-                    TextField("Total Amount (Optional)", value: $totalAmount, format: .currency(code: "USD"))
+                    TextField("Total Amount", value: $totalAmount, formatter: CurrencyFormatter.usd)
                         .keyboardType(.decimalPad)
                     
                     Stepper("Number of Installments: \(numberOfInstallments)", value: $numberOfInstallments, in: 1...120)

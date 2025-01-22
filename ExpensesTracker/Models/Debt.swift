@@ -1,9 +1,9 @@
 import Foundation
 
 struct Debt: Identifiable, Codable {
-    var id: UUID
+    var id: String?
     var name: String
-    var totalAmount: Double?
+    var totalAmount: Double
     var numberOfInstallments: Int
     var startDate: Date
     var status: DebtStatus
@@ -13,14 +13,14 @@ struct Debt: Identifiable, Codable {
     var createdBy: String
     var lastModified: Date
     
-    init(id: UUID = UUID(), 
-         name: String, 
-         totalAmount: Double? = nil,
-         numberOfInstallments: Int,
-         startDate: Date = Date(),
-         description: String? = nil,
-         sharedWithPartner: Bool = false) {
-        self.id = id
+    init(
+        name: String,
+        totalAmount: Double,
+        numberOfInstallments: Int,
+        startDate: Date = Date(),
+        description: String? = nil,
+        sharedWithPartner: Bool = false
+    ) {
         self.name = name
         self.totalAmount = totalAmount
         self.numberOfInstallments = numberOfInstallments
@@ -32,8 +32,7 @@ struct Debt: Identifiable, Codable {
         self.lastModified = Date()
         self.installments = []
         
-        // Generate installments
-        self.generateInstallments()
+        generateInstallments()
     }
     
     private mutating func generateInstallments() {
@@ -45,7 +44,7 @@ struct Debt: Identifiable, Codable {
                 let installment = DebtInstallment(
                     number: i + 1,
                     dueDate: dueDate,
-                    amount: totalAmount.map { $0 / Double(numberOfInstallments) }
+                    amount: totalAmount / Double(numberOfInstallments)
                 )
                 installments.append(installment)
             }
@@ -54,17 +53,22 @@ struct Debt: Identifiable, Codable {
         self.installments = installments
     }
     
+    mutating func regenerateInstallments(newTotalAmount: Double, newNumberOfInstallments: Int) {
+       totalAmount = newTotalAmount
+       numberOfInstallments = newNumberOfInstallments
+       generateInstallments()
+   }
+    
     var progress: Double {
         let paidInstallments = installments.filter { $0.isPaid }.count
         return Double(paidInstallments) / Double(numberOfInstallments)
     }
     
-    var remainingAmount: Double? {
-        guard let total = totalAmount else { return nil }
+    var remainingAmount: Double {
         let paidAmount = installments
             .compactMap { $0.paidAmount }
             .reduce(0, +)
-        return total - paidAmount
+        return totalAmount - paidAmount
     }
 }
 

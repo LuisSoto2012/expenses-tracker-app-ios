@@ -1,9 +1,23 @@
 import Foundation
 import Combine
 
+@MainActor
 class DebtViewModel: ObservableObject {
+    private let firebaseService: FirebaseService
+    
     @Published var debts: [Debt] = []
     @Published var selectedFilter: DebtStatus?
+    
+    init(firebaseService: FirebaseService = .shared) {
+        self.firebaseService = firebaseService
+        setupListener()
+    }
+    
+    private func setupListener() {
+        firebaseService.observeDebts { [weak self] debts in
+            self?.debts = debts
+        }
+    }
     
     var filteredDebts: [Debt] {
         guard let filter = selectedFilter else { return debts }
@@ -11,7 +25,7 @@ class DebtViewModel: ObservableObject {
     }
     
     var totalDebtAmount: Double {
-        debts.compactMap { $0.totalAmount }.reduce(0, +)
+        debts.reduce(0) { $0 + $1.totalAmount }
     }
     
     var activeDebtsCount: Int {
@@ -25,33 +39,76 @@ class DebtViewModel: ObservableObject {
     }
     
     func addDebt(_ debt: Debt) {
-        debts.append(debt)
-        // TODO: Implement cloud sync
+        Task {
+            do {
+                try await firebaseService.addDebt(debt)
+            } catch {
+                print("Error adding debt: \(error)")
+            }
+        }
     }
     
-    func updateDebt(_ debt: Debt) {
-        if let index = debts.firstIndex(where: { $0.id == debt.id }) {
-            debts[index] = debt
-            // TODO: Implement cloud sync
+    func updateDebt(_ debt: Debt, with updates: (inout Debt) -> Void) {
+        var updatedDebt = debt
+        updates(&updatedDebt)
+        updatedDebt.lastModified = Date()
+        
+        Task {
+            do {
+                try await firebaseService.updateDebt(updatedDebt)
+            } catch {
+                print("Error updating debt: \(error)")
+            }
+        }
+    }
+    
+    func deleteDebt(_ debt: Debt) {
+        Task {
+            do {
+                try await firebaseService.deleteDebt(debt)
+            } catch {
+                print("Error deleting debt: \(error)")
+            }
         }
     }
     
     func registerPayment(for debt: Debt, installmentNumber: Int, amount: Double?) {
+        guard let index = debt.installments.firstIndex(where: { $0.number == installmentNumber }) else { return }
+        
         var updatedDebt = debt
-        if var installment = updatedDebt.installments.first(where: { $0.number == installmentNumber }) {
-            installment.paidAmount = amount
-            installment.paidDate = Date()
-            
-            if let index = updatedDebt.installments.firstIndex(where: { $0.number == installmentNumber }) {
-                updatedDebt.installments[index] = installment
+        updatedDebt.installments[index].paidAmount = amount ?? updatedDebt.installments[index].amount
+        updatedDebt.installments[index].paidDate = Date()
+        
+        if updatedDebt.installments.allSatisfy(\.isPaid) {
+            updatedDebt.status = .paid
+        }
+        
+        updatedDebt.lastModified = Date()
+        
+        Task {
+            do {
+                try await firebaseService.updateDebt(updatedDebt)
+            } catch {
+                print("Error registering payment: \(error)")
             }
-            
-            // Update debt status if all installments are paid
-            if updatedDebt.installments.allSatisfy(\.isPaid) {
-                updatedDebt.status = .paid
+        }
+    }
+    
+    func undoPayment(for debt: Debt, installmentNumber: Int) {
+        guard let index = debt.installments.firstIndex(where: { $0.number == installmentNumber }) else { return }
+        
+        var updatedDebt = debt
+        updatedDebt.installments[index].paidAmount = nil
+        updatedDebt.installments[index].paidDate = nil
+        updatedDebt.status = .pending
+        updatedDebt.lastModified = Date()
+        
+        Task {
+            do {
+                try await firebaseService.updateDebt(updatedDebt)
+            } catch {
+                print("Error undoing payment: \(error)")
             }
-            
-            updateDebt(updatedDebt)
         }
     }
 } 
