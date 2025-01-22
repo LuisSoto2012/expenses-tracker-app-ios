@@ -54,14 +54,6 @@ struct HomeView: View {
                 .padding(.top)
             }
             .navigationTitle("Inicio")
-            .toolbar {
-                Button(action: {
-                    // Agregar nuevo gasto acción
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                }
-            }
         }
     }
 }

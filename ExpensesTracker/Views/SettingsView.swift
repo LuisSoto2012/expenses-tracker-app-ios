@@ -17,7 +17,7 @@ struct SettingsView: View {
                         HStack {
                             Label {
                                 Text("Administrar Categorías")
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.primary)
                             } icon: {
                                 Image(systemName: "tag")
                             }
@@ -40,7 +40,7 @@ struct SettingsView: View {
                     Button(action: { showingExportSheet = true }) {
                         Label {
                             Text("Exportar Datos")
-                                .foregroundColor(.black)
+                                .foregroundColor(.primary)
                         } icon: {
                             Image(systemName: "square.and.arrow.up")
                         }

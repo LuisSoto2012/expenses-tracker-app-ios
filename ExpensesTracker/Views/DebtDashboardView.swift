@@ -16,7 +16,7 @@ struct DebtDashboardView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddDebt = true }) {
-                        Image(systemName: "plus")
+                        Image(systemName: "plus.circle.fill")
                     }
                 }
             }
