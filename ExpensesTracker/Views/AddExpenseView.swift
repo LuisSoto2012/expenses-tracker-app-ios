@@ -17,10 +17,10 @@ struct AddExpenseView: View {
             Form {
                 // Amount Section
                 Section {
-                    TextField("Amount", text: $amount)
+                    TextField("Monto", text: $amount)
                         .keyboardType(.decimalPad)
                 } header: {
-                    Text("Amount")
+                    Text("Monto")
                 }
                 
                 // Category Section
@@ -39,45 +39,45 @@ struct AddExpenseView: View {
                         .padding(.vertical, 8)
                     }
                 } header: {
-                    Text("Category")
+                    Text("Categoría")
                 }
                 
                 // Date & Notes Section
                 Section {
-                    DatePicker("Date", selection: $date, displayedComponents: .date)
-                    TextField("Notes", text: $notes)
+                    DatePicker("Fecha", selection: $date, displayedComponents: .date)
+                    TextField("Notas", text: $notes)
                 } header: {
-                    Text("Details")
+                    Text("Detalles")
                 }
                 
                 // Recurring Expense Section
                 Section {
-                    Toggle("Recurring Expense", isOn: $isRecurring)
+                    Toggle("Gasto Recurrente", isOn: $isRecurring)
                     
                     if isRecurring {
-                        Picker("Interval", selection: $recurrenceInterval) {
-                            Text("Daily").tag(RecurrenceInterval.daily)
-                            Text("Weekly").tag(RecurrenceInterval.weekly)
-                            Text("Monthly").tag(RecurrenceInterval.monthly)
-                            Text("Yearly").tag(RecurrenceInterval.yearly)
+                        Picker("Intervalo", selection: $recurrenceInterval) {
+                            Text("Diario").tag(RecurrenceInterval.daily)
+                            Text("Semanal").tag(RecurrenceInterval.weekly)
+                            Text("Mensual").tag(RecurrenceInterval.monthly)
+                            Text("Anual").tag(RecurrenceInterval.yearly)
                         }
                         
-                        Toggle("Fixed Amount", isOn: $isFixed)
+                        Toggle("Monto Fijo", isOn: $isFixed)
                     }
                 } header: {
-                    Text("Recurrence")
+                    Text("Recurrencia")
                 }
             }
-            .navigationTitle("New Expense")
+            .navigationTitle("Nuevo Gasto")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("Cancelar") {
                         dismiss()
                     }
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button("Guardar") {
                         saveExpense()
                     }
                     .disabled(!isFormValid)
@@ -139,4 +139,4 @@ struct CategoryButton: View {
             }
         }
     }
-} 
+}

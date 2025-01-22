@@ -24,27 +24,27 @@ struct EditDebtView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Debt Details") {
-                    TextField("Debt Name", text: $name)
+                Section("Detalles de la Deuda") {
+                    TextField("Nombre de la Deuda", text: $name)
                     
-                    TextField("Total Amount", value: $totalAmount, formatter: CurrencyFormatter.usd)
+                    TextField("Monto Total", value: $totalAmount, formatter: CurrencyFormatter.usd)
                         .keyboardType(.decimalPad)
                     
-                    Stepper("Number of Installments: \(numberOfInstallments)", value: $numberOfInstallments, in: 1...36)
+                    Stepper("Número de Cuotas: \(numberOfInstallments)", value: $numberOfInstallments, in: 1...36)
                     
-                    TextField("Description", text: $description)
+                    TextField("Descripción", text: $description)
                     
-                    Toggle("Share with Partner", isOn: $sharedWithPartner)
+                    Toggle("Compartir con Pareja", isOn: $sharedWithPartner)
                 }
             }
-            .navigationTitle("Edit Debt")
+            .navigationTitle("Editar Deuda")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancelar") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button("Guardar") {
                         saveChanges()
                         dismiss()
                     }
@@ -63,4 +63,4 @@ struct EditDebtView: View {
             debt.regenerateInstallments(newTotalAmount: totalAmount, newNumberOfInstallments: numberOfInstallments)
         }
     }
-} 
+}

@@ -31,7 +31,7 @@ struct ExpenseRowView: View {
             // Expense details
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(category?.name ?? "Unknown")
+                    Text(category?.name ?? "Desconocido")
                         .font(.headline)
                     
                     if expense.isRecurring {
@@ -70,19 +70,19 @@ struct ExpenseRowView: View {
                 expenseToDelete = expense
                 showDeleteConfirmation = true
             } label: {
-                Label("Delete", systemImage: "trash")
+                Label("Eliminar", systemImage: "trash")
             }
         }
         .alert(isPresented: $showDeleteConfirmation) {
             Alert(
-                title: Text("Delete Expense"),
-                message: Text("Are you sure you want to delete this expense?"),
-                primaryButton: .destructive(Text("Delete")) {
+                title: Text("Eliminar Gasto"),
+                message: Text("¿Estás seguro de que quieres eliminar este gasto?"),
+                primaryButton: .destructive(Text("Eliminar")) {
                     if let expenseToDelete = expenseToDelete {
                         expenseViewModel.deleteExpense(expenseToDelete)
                     }
                 },
-                secondaryButton: .cancel()
+                secondaryButton: .cancel(Text("Cancelar"))
             )
         }
     }
@@ -91,7 +91,7 @@ struct ExpenseRowView: View {
 #Preview {
     ExpenseRowView(expense: Expense(
         amount: 42.50,
-        notes: "Grocery shopping",
+        notes: "Compra de supermercado",
         categoryId: Category.defaults[0].id,
         isRecurring: true,
         recurrenceInterval: .monthly

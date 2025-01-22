@@ -20,7 +20,7 @@ struct ExpensesView: View {
                 VStack(spacing: 16) {
                     // Month Picker
                     DatePicker(
-                        "Select Month",
+                        "Seleccionar Mes",
                         selection: $selectedMonth,
                         displayedComponents: .date
                     )
@@ -31,7 +31,7 @@ struct ExpensesView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             CategoryFilterChip(
-                                name: "All",
+                                name: "Todos",
                                 isSelected: selectedCategoryId == nil
                             ) {
                                 selectedCategoryId = nil
@@ -65,7 +65,7 @@ struct ExpensesView: View {
                 }
                 .listStyle(.plain)
             }
-            .navigationTitle("Expenses")
+            .navigationTitle("Gastos")
             .toolbar {
                 Button(action: {
                     showingAddExpense = true
@@ -105,4 +105,4 @@ struct CategoryFilterChip: View {
                 .cornerRadius(20)
         }
     }
-} 
+}

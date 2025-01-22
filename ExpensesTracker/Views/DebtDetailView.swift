@@ -29,25 +29,25 @@ struct DebtDetailView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
                     Button(action: { showingEditSheet = true }) {
-                        Label("Edit Debt", systemImage: "pencil")
+                        Label("Editar Deuda", systemImage: "pencil")
                     }
                     
                     Button(role: .destructive, action: { showingDeleteAlert = true }) {
-                        Label("Delete Debt", systemImage: "trash")
+                        Label("Eliminar Deuda", systemImage: "trash")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
             }
         }
-        .alert("Delete Debt", isPresented: $showingDeleteAlert) {
-            Button("Cancel", role: .cancel) { }
-            Button("Delete", role: .destructive) {
+        .alert("Eliminar Deuda", isPresented: $showingDeleteAlert) {
+            Button("Cancelar", role: .cancel) { }
+            Button("Eliminar", role: .destructive) {
                 viewModel.deleteDebt(debt)
                 dismiss()
             }
         } message: {
-            Text("Are you sure you want to delete this debt? This action cannot be undone.")
+            Text("¿Estás seguro de que quieres eliminar esta deuda? Esta acción no se puede deshacer.")
         }
         .sheet(isPresented: $showingEditSheet) {
             EditDebtView(debt: debt, viewModel: viewModel)
@@ -55,37 +55,37 @@ struct DebtDetailView: View {
     }
     
     private var debtInfoSection: some View {
-        Section("Debt Information") {
-            LabeledContent("Total Amount") {
+        Section("Información de la Deuda") {
+            LabeledContent("Monto Total") {
                Text(debt.totalAmount.formatted(.currency(code: "USD")))
            }
 
-           LabeledContent("Remaining") {
+           LabeledContent("Restante") {
                Text(debt.remainingAmount.formatted(.currency(code: "USD")))
            }
             
-            LabeledContent("Status") {
+            LabeledContent("Estado") {
                 StatusBadge(status: debt.status)
             }
             
-            LabeledContent("Progress") {
+            LabeledContent("Progreso") {
                 Text("\(Int(debt.progress * 100))%")
             }
             
             if let description = debt.description {
-                LabeledContent("Description") {
+                LabeledContent("Descripción") {
                     Text(description)
                 }
             }
             
-            LabeledContent("Shared") {
-                Text(debt.sharedWithPartner ? "Yes" : "No")
+            LabeledContent("Compartido") {
+                Text(debt.sharedWithPartner ? "Sí" : "No")
             }
         }
     }
     
     private var installmentsSection: some View {
-        Section("Installments") {
+        Section("Cuotas") {
             ForEach(debt.installments) { installment in
                 InstallmentRow(installment: installment, debt: debt, viewModel: viewModel)
                     .contentShape(Rectangle())
@@ -106,7 +106,7 @@ struct InstallmentRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Installment #\(installment.number)")
+                Text("Cuota #\(installment.number)")
                     .font(.headline)
                 Spacer()
                 if installment.isPaid {
@@ -117,7 +117,7 @@ struct InstallmentRow: View {
             
             HStack {
                 VStack(alignment: .leading) {
-                    Text("Due Date")
+                    Text("Fecha de Vencimiento")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(installment.dueDate.formatted(date: .abbreviated, time: .omitted))
@@ -126,7 +126,7 @@ struct InstallmentRow: View {
                 Spacer()
                 
                 VStack(alignment: .trailing) {
-                    Text("Amount")
+                    Text("Monto")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Text(installment.amount.formatted(.currency(code: "USD")))
@@ -135,7 +135,7 @@ struct InstallmentRow: View {
             
             if installment.isPaid {
                 HStack {
-                    Text("Paid")
+                    Text("Pagada")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
@@ -143,7 +143,7 @@ struct InstallmentRow: View {
                         Text(paidAmount.formatted(.currency(code: "USD")))
                     }
                     if let paidDate = installment.paidDate {
-                        Text("on \(paidDate.formatted(date: .abbreviated, time: .omitted))")
+                        Text("el \(paidDate.formatted(date: .abbreviated, time: .omitted))")
                     }
                     
                     Spacer()
@@ -175,24 +175,24 @@ struct RegisterPaymentView: View {
         NavigationView {
             Form {
                 Section {
-                    Toggle("Specify payment amount", isOn: $showingAmountField)
+                    Toggle("Especificar monto de pago", isOn: $showingAmountField)
                     
                     if showingAmountField {
-                        TextField("Amount", value: $amount, format: .currency(code: "USD"))
+                        TextField("Monto", value: $amount, format: .currency(code: "USD"))
                             .keyboardType(.decimalPad)
                     }
                 } footer: {
-                    Text("If you don't specify an amount, the installment will be marked as paid with the expected amount.")
+                    Text("Si no especificas un monto, la cuota se marcará como pagada con el monto esperado.")
                 }
             }
-            .navigationTitle("Register Payment")
+            .navigationTitle("Registrar Pago")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancelar") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button("Guardar") {
                         registerPayment()
                         dismiss()
                     }
@@ -209,4 +209,4 @@ struct RegisterPaymentView: View {
             amount: paymentAmount
         )
     }
-} 
+}

@@ -11,10 +11,15 @@ struct SettingsView: View {
         NavigationView {
             List {
                 // Categories Section
-                Section("Categories") {
+                Section("Categorías") {
                     Button(action: { showingCategorySheet = true }) {
                         HStack {
-                            Label("Manage Categories", systemImage: "tag")
+                            Label {
+                                Text("Administrar Categorías")
+                                    .foregroundColor(.black)
+                            } icon: {
+                                Image(systemName: "tag")
+                            }
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.secondary)
@@ -23,58 +28,63 @@ struct SettingsView: View {
                 }
                 
                 // Budget Section
-                Section("Budget") {
+                Section("Presupuesto") {
                     NavigationLink(destination: BudgetSettingsView().environmentObject(expenseViewModel)) {
-                        Label("Budget Settings", systemImage: "chart.bar")
+                        Label("Configuración de Presupuesto", systemImage: "chart.bar")
                     }
                 }
                 
                 // Data Management
-                Section("Data") {
+                Section("Datos") {
                     Button(action: { showingExportSheet = true }) {
-                        Label("Export Data", systemImage: "square.and.arrow.up")
+                        Label {
+                            Text("Exportar Datos")
+                                .foregroundColor(.black)
+                        } icon: {
+                            Image(systemName: "square.and.arrow.up")
+                        }
                     }
                 }
                 
                 // Account Section
-                Section("Account") {
+                Section("Cuenta") {
                     if let user = Auth.auth().currentUser {
                         HStack {
-                            Label("Email", systemImage: "envelope")
+                            Label("Correo Electrónico", systemImage: "envelope")
                             Spacer()
                             Text(user.email ?? "")
                                 .foregroundColor(.secondary)
                         }
                         
                         Button(role: .destructive, action: { showingSignOutAlert = true }) {
-                            Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                            Label("Cerrar Sesión", systemImage: "rectangle.portrait.and.arrow.right")
                         }
                     }
                 }
                 
                 // About Section
-                Section("About") {
+                Section("Acerca de") {
                     HStack {
-                        Label("Version", systemImage: "info.circle")
+                        Label("Versión", systemImage: "info.circle")
                         Spacer()
                         Text("1.0.0")
                             .foregroundColor(.secondary)
                     }
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("Configuración")
         }
         .sheet(isPresented: $showingCategorySheet) {
             CategoryManagementView()
                 .environmentObject(expenseViewModel)
         }
-        .alert("Sign Out", isPresented: $showingSignOutAlert) {
-            Button("Cancel", role: .cancel) { }
-            Button("Sign Out", role: .destructive) {
+        .alert("Cerrar Sesión", isPresented: $showingSignOutAlert) {
+            Button("Cancelar", role: .cancel) { }
+            Button("Cerrar Sesión", role: .destructive) {
                 try? Auth.auth().signOut()
             }
         } message: {
-            Text("Are you sure you want to sign out?")
+            Text("¿Estás seguro de que deseas cerrar sesión?")
         }
     }
 }
@@ -97,10 +107,10 @@ struct CategoryManagementView: View {
                     expenseViewModel.deleteCategories(at: indexSet)
                 }
             }
-            .navigationTitle("Categories")
+            .navigationTitle("Categorías")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
+                    Button("Hecho") { dismiss() }
                 }
                 
                 ToolbarItem(placement: .primaryAction) {
@@ -172,7 +182,7 @@ struct CategoryFormView: View {
     var body: some View {
         NavigationView {
             Form {
-                TextField("Category Name", text: $name)
+                TextField("Nombre de Categoría", text: $name)
                 
                 ColorPicker("Color", selection: Binding(
                     get: { Color(hex: color) ?? .blue },
@@ -180,16 +190,16 @@ struct CategoryFormView: View {
                 ))
                 
                 // Icon picker would go here
-                TextField("Icon Name (SF Symbol)", text: $icon)
+                TextField("Nombre del Icono (Símbolo SF)", text: $icon)
             }
             .navigationTitle(title)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancelar") { dismiss() }
                 }
                 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button("Guardar") {
                         saveCategory()
                         dismiss()
                     }
@@ -202,9 +212,9 @@ struct CategoryFormView: View {
     private var title: String {
         switch mode {
         case .add:
-            return "New Category"
+            return "Nueva Categoría"
         case .edit:
-            return "Edit Category"
+            return "Editar Categoría"
         }
     }
     

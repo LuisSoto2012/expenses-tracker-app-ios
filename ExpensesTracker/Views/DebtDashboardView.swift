@@ -12,7 +12,7 @@ struct DebtDashboardView: View {
                 
                 debtsSection
             }
-            .navigationTitle("Debt Management")
+            .navigationTitle("Gestión de Deudas")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddDebt = true }) {
@@ -30,7 +30,7 @@ struct DebtDashboardView: View {
         Section {
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Text("Total Debt")
+                    Text("Deuda Total")
                         .font(.subheadline)
                     Spacer()
                     Text(viewModel.totalDebtAmount.formatted(.currency(code: "USD")))
@@ -38,7 +38,7 @@ struct DebtDashboardView: View {
                 }
                 
                 HStack {
-                    Text("Active Debts")
+                    Text("Deudas Activas")
                         .font(.subheadline)
                     Spacer()
                     Text("\(viewModel.activeDebtsCount)")
@@ -46,7 +46,7 @@ struct DebtDashboardView: View {
                 }
                 
                 HStack {
-                    Text("Upcoming Payments")
+                    Text("Pagos Pendientes")
                         .font(.subheadline)
                     Spacer()
                     Text("\(viewModel.upcomingPaymentsCount)")
@@ -66,12 +66,12 @@ struct DebtDashboardView: View {
             }
         } header: {
             HStack {
-                Text("Your Debts")
+                Text("Tus Deudas")
                 Spacer()
-                Picker("Filter", selection: $selectedFilter) {
-                    Text("All").tag(Optional<DebtStatus>.none)
-                    Text("Pending").tag(Optional<DebtStatus>.some(.pending))
-                    Text("Paid").tag(Optional<DebtStatus>.some(.paid))
+                Picker("Filtrar", selection: $selectedFilter) {
+                    Text("Todas").tag(Optional<DebtStatus>.none)
+                    Text("Pendientes").tag(Optional<DebtStatus>.some(.pending))
+                    Text("Pagadas").tag(Optional<DebtStatus>.some(.paid))
                 }
                 .pickerStyle(.menu)
             }
@@ -98,7 +98,7 @@ struct DebtRowView: View {
             ProgressView(value: debt.progress)
                 .tint(debt.progress == 1 ? .green : .blue)
             
-            Text("\(Int(debt.progress * 100))% - \(debt.installments.filter(\.isPaid).count)/\(debt.numberOfInstallments) paid")
+            Text("\(Int(debt.progress * 100))% - \(debt.installments.filter(\.isPaid).count)/\(debt.numberOfInstallments) pagados")
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
@@ -118,4 +118,4 @@ struct StatusBadge: View {
             .foregroundColor(status == .paid ? .green : .orange)
             .clipShape(Capsule())
     }
-} 
+}

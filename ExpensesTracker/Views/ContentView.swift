@@ -17,40 +17,40 @@ struct ContentView: View {
             HomeView()
                 .environmentObject(expenseViewModel)
                 .tabItem {
-                    Label("Home", systemImage: "house.fill")
+                    Label("Inicio", systemImage: "house.fill") // Translated text
                 }
             
             ExpensesView()
                 .environmentObject(expenseViewModel)
                 .tabItem {
-                    Label("Expenses", systemImage: "dollarsign.circle.fill")
+                    Label("Gastos", systemImage: "dollarsign.circle.fill") // Translated text
                 }
             
             DebtDashboardView()
                 .tabItem {
-                    Label("Debts", systemImage: "creditcard.fill")
+                    Label("Deudas", systemImage: "creditcard.fill") // Translated text
                 }
             
             DashboardView()
                 .environmentObject(expenseViewModel)
                 .tabItem {
-                    Label("Dashboard", systemImage: "chart.pie.fill")
+                    Label("Estadísticas", systemImage: "chart.pie.fill") // Translated text
                 }
             
             SettingsView()
                 .environmentObject(expenseViewModel)
                 .tabItem {
-                    Label("Settings", systemImage: "gear")
+                    Label("Configuración", systemImage: "gear") // Translated text
                 }
         }
         .onChange(of: expenseViewModel.expenses) { _ in
             checkBudgetAlerts()
         }
-        .alert("Budget Alert", isPresented: $showingBudgetAlert) {
-            Button("OK", role: .cancel) { }
+        .alert("Alerta de presupuesto", isPresented: $showingBudgetAlert) { // Translated text
+            Button("Aceptar", role: .cancel) { } // Translated text
         } message: {
             if let category = budgetAlertCategory {
-                Text("You've exceeded your budget for \(category.name)")
+                Text("Has excedido tu presupuesto para \(category.name)") // Translated text
             }
         }
     }

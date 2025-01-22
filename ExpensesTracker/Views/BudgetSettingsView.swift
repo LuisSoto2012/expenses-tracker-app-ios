@@ -8,18 +8,18 @@ struct BudgetSettingsView: View {
         List {
             Section {
                 DatePicker(
-                    "Month",
+                    "Mes", // Translated text
                     selection: $selectedMonth,
-                    displayedComponents: [.date] // Se enfoca solo en la fecha
+                    displayedComponents: [.date] // Focuses on date only (month and year)
                 )
-                .datePickerStyle(.compact) // Cambia al estilo compacto (mes y año)
+                .datePickerStyle(.compact) // Uses compact style for month and year
                 .onChange(of: selectedMonth) { _ in
-                    // Garantiza que siempre sea el inicio del mes
+                    // Ensures the date is always the start of the month
                     selectedMonth = selectedMonth.startOfMonth
                 }
             }
             
-            Section("Category Budgets") {
+            Section("Presupuestos por categoría") { // Translated text
                 ForEach(expenseViewModel.categories) { category in
                     NavigationLink {
                         CategoryBudgetView(category: category, month: selectedMonth)
@@ -29,17 +29,17 @@ struct BudgetSettingsView: View {
                 }
             }
             
-            Section("Debt Management") {
+            Section("Gestión de deudas") { // Translated text
                 NavigationLink(destination: DebtDashboardView()) {
                     HStack {
                         Image(systemName: "creditcard.fill")
                             .foregroundColor(.blue)
-                        Text("Manage Debts")
+                        Text("Gestionar deudas") // Translated text
                     }
                 }
             }
         }
-        .navigationTitle("Budget Settings")
+        .navigationTitle("Configuración de presupuesto") // Translated text
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -79,7 +79,7 @@ struct CategoryBudgetRow: View {
                                 .foregroundColor(.secondary)
                         }
                 } else {
-                    Text("No budget set")
+                    Text("Sin presupuesto establecido") // Translated text
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -102,17 +102,17 @@ struct CategoryBudgetView: View {
     var body: some View {
         Form {
             Section {
-                TextField("Budget Amount", text: $budgetAmount)
+                TextField("Monto del presupuesto", text: $budgetAmount) // Translated text
                     .keyboardType(.decimalPad)
             } header: {
-                Text("Monthly Budget")
+                Text("Presupuesto mensual") // Translated text
             } footer: {
-                Text("Set the maximum amount you want to spend in this category per month.")
+                Text("Establece la cantidad máxima que deseas gastar en esta categoría por mes.") // Translated text
             }
             
             if let budget = expenseViewModel.getBudget(for: category.id, month: month) {
                 Section {
-                    Button("Remove Budget", role: .destructive) {
+                    Button("Eliminar presupuesto", role: .destructive) { // Translated text
                         showingDeleteAlert = true
                     }
                 }
@@ -122,21 +122,21 @@ struct CategoryBudgetView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
+                Button("Guardar") { // Translated text
                     saveBudget()
                     dismiss()
                 }
                 .disabled(!isValid)
             }
         }
-        .alert("Remove Budget", isPresented: $showingDeleteAlert) {
-            Button("Cancel", role: .cancel) { }
-            Button("Remove", role: .destructive) {
+        .alert("Eliminar presupuesto", isPresented: $showingDeleteAlert) { // Translated text
+            Button("Cancelar", role: .cancel) { } // Translated text
+            Button("Eliminar", role: .destructive) { // Translated text
                 removeBudget()
                 dismiss()
             }
         } message: {
-            Text("Are you sure you want to remove the budget for this category?")
+            Text("¿Estás seguro de que deseas eliminar el presupuesto para esta categoría?") // Translated text
         }
         .onAppear {
             loadBudget()
@@ -158,16 +158,16 @@ struct CategoryBudgetView: View {
     }
     
     private func loadBudget() {
-        // Carga el presupuesto cuando la vista aparece
+        // Loads the budget when the view appears
         if let budget = expenseViewModel.getBudget(for: category.id, month: month) {
             budgetAmount = String(format: "%.2f", budget.amount)
         }
     }
 }
 
-// Helper extension to get start of month
+// Helper extension to get the start of the month
 extension Date {
     var startOfMonth: Date {
         Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: self)) ?? self
     }
-} 
+}

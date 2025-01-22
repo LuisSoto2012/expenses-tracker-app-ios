@@ -9,7 +9,7 @@ struct HomeView: View {
                 VStack(spacing: 20) {
                     // Monthly summary card
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Monthly Spending")
+                        Text("Gastos Mensuales")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                         
@@ -19,7 +19,7 @@ struct HomeView: View {
                         Divider()
                         
                         // Budget Overview
-                        Text("Budget Overview")
+                        Text("Visión General del Presupuesto")
                             .font(.headline)
                         
                         ForEach(expenseViewModel.categories) { category in
@@ -34,7 +34,7 @@ struct HomeView: View {
                         
                         Divider()
                         
-                        Text("Recent Expenses")
+                        Text("Gastos Recientes")
                             .font(.headline)
                     }
                     .padding()
@@ -53,10 +53,10 @@ struct HomeView: View {
                 }
                 .padding(.top)
             }
-            .navigationTitle("Home")
+            .navigationTitle("Inicio")
             .toolbar {
                 Button(action: {
-                    // Add new expense action
+                    // Agregar nuevo gasto acción
                 }) {
                     Image(systemName: "plus.circle.fill")
                         .font(.title3)
@@ -87,4 +87,4 @@ struct BudgetProgressView: View {
         }
         .padding(.vertical, 4)
     }
-} 
+}

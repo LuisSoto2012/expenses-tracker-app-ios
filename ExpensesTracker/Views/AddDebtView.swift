@@ -14,31 +14,31 @@ struct AddDebtView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Debt Details") {
-                    TextField("Debt Name", text: $name)
+                Section("Detalles de la Deuda") {
+                    TextField("Nombre de la Deuda", text: $name)
                     
-                    TextField("Total Amount", value: $totalAmount, formatter: CurrencyFormatter.usd)
+                    TextField("Monto Total", value: $totalAmount, formatter: CurrencyFormatter.usd)
                         .keyboardType(.decimalPad)
                     
-                    Stepper("Number of Installments: \(numberOfInstallments)", value: $numberOfInstallments, in: 1...120)
+                    Stepper("Número de Cuotas: \(numberOfInstallments)", value: $numberOfInstallments, in: 1...120)
                     
-                    DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                    DatePicker("Fecha de Inicio", selection: $startDate, displayedComponents: .date)
                 }
                 
-                Section("Additional Information") {
-                    TextField("Description (Optional)", text: $description)
+                Section("Información Adicional") {
+                    TextField("Descripción (Opcional)", text: $description)
                     
-                    Toggle("Share with Partner", isOn: $sharedWithPartner)
+                    Toggle("Compartir con Pareja", isOn: $sharedWithPartner)
                 }
             }
-            .navigationTitle("Add New Debt")
+            .navigationTitle("Agregar Nueva Deuda")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancelar") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button("Guardar") {
                         saveDebt()
                         dismiss()
                     }
@@ -59,4 +59,4 @@ struct AddDebtView: View {
         )
         viewModel.addDebt(debt)
     }
-} 
+}

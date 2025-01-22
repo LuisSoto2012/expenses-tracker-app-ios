@@ -19,7 +19,7 @@ struct DashboardView: View {
                 VStack(spacing: 20) {
                     // Date Picker
                     DatePicker(
-                        "Select Month",
+                        "Seleccionar Mes",
                         selection: $selectedDate,
                         displayedComponents: .date
                     )
@@ -28,25 +28,25 @@ struct DashboardView: View {
                     
                     // Category Breakdown Chart
                     ChartSection(
-                        title: "Category Breakdown",
+                        title: "Desglose por Categoría",
                         content: CategoryPieChart(data: monthlyExpensesByCategory)
                     )
                     
                     // Category List
                     ChartSection(
-                        title: "Expenses by Category",
+                        title: "Gastos por Categoría",
                         content: CategoryBreakdownList(data: monthlyExpensesByCategory)
                     )
                     
                     // Monthly Trend Chart
                     ChartSection(
-                        title: "6-Month Trend",
+                        title: "Tendencia de 6 Meses",
                         content: MonthlyTrendChart(data: monthlyTotals)
                     )
                 }
                 .padding(.vertical)
             }
-            .navigationTitle("Dashboard")
+            .navigationTitle("Resumen")
         }
     }
 }
@@ -77,7 +77,7 @@ struct CategoryPieChart: View {
     var body: some View {
         Chart(data, id: \.0.id) { item in
             SectorMark(
-                angle: .value("Amount", item.1),
+                angle: .value("Monto", item.1),
                 innerRadius: .ratio(0.618),
                 angularInset: 1.5
             )
@@ -85,7 +85,7 @@ struct CategoryPieChart: View {
         }
         .frame(height: 200)
         
-        // Legend
+        // Leyenda
         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
             ForEach(data, id: \.0.id) { item in
                 HStack {
@@ -146,14 +146,14 @@ struct MonthlyTrendChart: View {
     var body: some View {
         Chart(data, id: \.0) { item in
             LineMark(
-                x: .value("Month", item.0, unit: .month),
-                y: .value("Amount", item.1)
+                x: .value("Mes", item.0, unit: .month),
+                y: .value("Monto", item.1)
             )
             .foregroundStyle(Color.accentColor)
             
             PointMark(
-                x: .value("Month", item.0, unit: .month),
-                y: .value("Amount", item.1)
+                x: .value("Mes", item.0, unit: .month),
+                y: .value("Monto", item.1)
             )
             .foregroundStyle(Color.accentColor)
         }
@@ -169,4 +169,4 @@ struct MonthlyTrendChart: View {
         }
         .frame(height: 200)
     }
-} 
+}
