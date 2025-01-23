@@ -8,7 +8,10 @@ class DebtViewModel: ObservableObject {
     @Published var debts: [Debt] = []
     @Published var selectedFilter: DebtStatus?
     
-    init(firebaseService: FirebaseService = .shared) {
+    private var expenseViewModel: ExpenseViewModel
+    
+    init(expenseViewModel: ExpenseViewModel, firebaseService: FirebaseService = .shared) {
+        self.expenseViewModel = expenseViewModel
         self.firebaseService = firebaseService
         setupListener()
     }
@@ -41,9 +44,28 @@ class DebtViewModel: ObservableObject {
     func addDebt(_ debt: Debt) {
         Task {
             do {
-                try await firebaseService.addDebt(debt)
+                // Llama a getCategoryByName para obtener la categoría "Deudas"
+                firebaseService.getCategoryByName("Deudas") { category in
+                    guard let category = category else {
+                        print("Category 'Deudas' not found.")
+                        return
+                    }
+                    
+                    // Asocia la categoría con la deuda si es necesario
+                    var debtWithCategory = debt
+                    debtWithCategory.categoryId = category.id
+                    
+                    // Agrega la deuda a Firebase
+                    Task {
+                        do {
+                            try await self.firebaseService.addDebt(debtWithCategory)
+                        } catch {
+                            print("Error adding debt: \(error)")
+                        }
+                    }
+                }
             } catch {
-                print("Error adding debt: \(error)")
+                print("Error fetching category: \(error)")
             }
         }
     }
@@ -72,12 +94,13 @@ class DebtViewModel: ObservableObject {
         }
     }
     
-    func registerPayment(for debt: Debt, installmentNumber: Int, amount: Double?) {
+    func registerPayment(for debt: Debt, installmentNumber: Int, amount: Double?, expenseId: UUID?) {
         guard let index = debt.installments.firstIndex(where: { $0.number == installmentNumber }) else { return }
         
         var updatedDebt = debt
         updatedDebt.installments[index].paidAmount = amount ?? updatedDebt.installments[index].amount
         updatedDebt.installments[index].paidDate = Date()
+        updatedDebt.installments[index].expenseId = expenseId
         
         if updatedDebt.installments.allSatisfy(\.isPaid) {
             updatedDebt.status = .paid
@@ -97,9 +120,17 @@ class DebtViewModel: ObservableObject {
     func undoPayment(for debt: Debt, installmentNumber: Int) {
         guard let index = debt.installments.firstIndex(where: { $0.number == installmentNumber }) else { return }
         
+        // delete expense
+        guard let installment = debt.installments.first(where: { $0.number == installmentNumber }) else { return }
+        if let expenseId = installment.expenseId,
+           let expense = expenseViewModel.expenses.first(where: { $0.id == expenseId }) {
+            expenseViewModel.deleteExpense(expense)
+        }
+        
         var updatedDebt = debt
         updatedDebt.installments[index].paidAmount = nil
         updatedDebt.installments[index].paidDate = nil
+        updatedDebt.installments[index].expenseId = nil
         updatedDebt.status = .pending
         updatedDebt.lastModified = Date()
         

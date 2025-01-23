@@ -7,6 +7,7 @@ struct DebtInstallment: Identifiable, Codable {
     var amount: Double
     var paidAmount: Double?
     var paidDate: Date?
+    var expenseId: UUID?
     
     var isPaid: Bool { paidAmount != nil }
     

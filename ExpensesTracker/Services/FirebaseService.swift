@@ -57,13 +57,15 @@ class FirebaseService: ObservableObject {
         listeners.append(listener)
     }
     
-    func saveExpense(_ expense: Expense) {
+    func saveExpense(_ expense: Expense) -> UUID? {
         do {
             try db.collection("expenses")
                 .document(expense.id.uuidString)
                 .setData(from: expense)
+            return expense.id
         } catch {
             print("Error saving expense: \(error.localizedDescription)")
+            return nil
         }
     }
     
@@ -75,6 +77,26 @@ class FirebaseService: ObservableObject {
         } catch {
             print("Error saving category: \(error.localizedDescription)")
         }
+    }
+    
+    func getCategoryByName(_ name: String, completion: @escaping (Category?) -> Void) {
+        db.collection("categories")
+            .whereField("name", isEqualTo: name)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching category by name: \(error.localizedDescription)")
+                    completion(nil)
+                    return
+                }
+                
+                guard let document = snapshot?.documents.first else {
+                    completion(nil) // No category found with the given name
+                    return
+                }
+                
+                let category = try? document.data(as: Category.self)
+                completion(category)
+            }
     }
     
     func saveBudget(_ budget: Budget) {
@@ -125,7 +147,8 @@ class FirebaseService: ObservableObject {
                     return
                 }
                 
-                let debts = documents.compactMap { document -> Debt? in
+                // Agregar una anotación de tipo explícita a `debts`
+                let debts: [Debt] = documents.compactMap { document -> Debt? in
                     guard let firebaseDebt = try? document.data(as: Debt.FirebaseDebt.self) else { return nil }
                     return firebaseDebt.toDebt()
                 }
@@ -133,31 +156,32 @@ class FirebaseService: ObservableObject {
             }
         listeners.append(listener)
     }
-    
+
     func addDebt(_ debt: Debt) async throws {
         var newDebt = debt
         newDebt.createdBy = Auth.auth().currentUser?.uid ?? ""
-        let firebaseDebt = Debt.FirebaseDebt(from: newDebt)
-        _ = try db.collection("debts").addDocument(from: firebaseDebt)
+        newDebt.creationDate = Date()
+        try db.collection("debts").document(newDebt.id.uuidString).setData(from: newDebt)
     }
-    
+
     func updateDebt(_ debt: Debt) async throws {
-        guard let id = debt.id else { return }
-        let firebaseDebt = Debt.FirebaseDebt(from: debt)
-        try db.collection("debts").document(id).setData(from: firebaseDebt)
+        let id = debt.id.uuidString
+        var updatedDebt = debt
+        updatedDebt.lastModified = Date()
+        try db.collection("debts").document(id).setData(from: updatedDebt)
     }
-    
+
     func deleteDebt(_ debt: Debt) async throws {
-        guard let id = debt.id else { return }
+        let id = debt.id.uuidString
         try await db.collection("debts").document(id).delete()
     }
 }
 
 // Add this extension to handle Firebase-specific debt mapping
 private extension Debt {
-    // For Firebase storage
+    // Para Firebase storage
     struct FirebaseDebt: Codable {
-        @DocumentID var id: String?
+        @DocumentID var id: String? // ID en Firebase es un String
         var name: String
         var totalAmount: Double
         var numberOfInstallments: Int
@@ -169,9 +193,10 @@ private extension Debt {
         var createdBy: String
         var creationDate: Date
         var lastModified: Date?
-        
+
+        // Convertir de Debt a FirebaseDebt
         init(from debt: Debt) {
-            self.id = debt.id
+            self.id = debt.id.uuidString // Convertir el UUID a String
             self.name = debt.name
             self.totalAmount = debt.totalAmount
             self.numberOfInstallments = debt.numberOfInstallments
@@ -184,9 +209,11 @@ private extension Debt {
             self.lastModified = nil
             self.creationDate = Date()
         }
-        
+
+        // Convertir de FirebaseDebt a Debt
         func toDebt() -> Debt {
             var debt = Debt(
+                id: UUID(uuidString: id ?? "") ?? UUID(), // Convertir String a UUID, o generar uno nuevo si es nil
                 name: name,
                 totalAmount: totalAmount,
                 numberOfInstallments: numberOfInstallments,
@@ -194,7 +221,6 @@ private extension Debt {
                 description: description,
                 sharedWithPartner: sharedWithPartner
             )
-            debt.id = id
             debt.status = status
             debt.installments = installments
             debt.createdBy = createdBy

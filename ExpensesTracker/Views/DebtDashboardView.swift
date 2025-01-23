@@ -1,11 +1,18 @@
 import SwiftUI
 
 struct DebtDashboardView: View {
-    @StateObject private var viewModel = DebtViewModel()
+    @StateObject private var expenseViewModel = ExpenseViewModel()
+    @StateObject private var viewModel = DebtViewModel
+    
     @State private var showingAddDebt = false
     @State private var selectedFilter: DebtStatus?
     @State private var selectedSortCriteria: SortCriteria?
     //@State private var selectedSortCriteria: SortCriteria = .nextPaymentDate
+    
+    init() {
+        // Aquí pasas el ExpenseViewModel al DebtViewModel
+        _viewModel = StateObject(wrappedValue: DebtViewModel(expenseViewModel: expenseViewModel))
+    }
     
     var body: some View {
         NavigationView {
@@ -62,7 +69,7 @@ struct DebtDashboardView: View {
     private var debtsSection: some View {
         Section {
             ForEach(filteredAndSortedDebts) { debt in
-                NavigationLink(destination: DebtDetailView(debt: debt, viewModel: viewModel)) {
+                NavigationLink(destination: DebtDetailView(debt: debt, viewModel: viewModel, expenseViewModel: expenseViewModel)) {
                     DebtRowView(debt: debt, selectedSortCriteria: selectedSortCriteria)
                 }
             }

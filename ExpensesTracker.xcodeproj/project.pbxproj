@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6B5E3A242D40D3E300B87A2E /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6B5E3A232D40D3E300B87A2E /* SFSymbolsPicker */; };
+		6B5E3A272D41B6F500B87A2E /* ConfettiView in Frameworks */ = {isa = PBXBuildFile; productRef = 6B5E3A262D41B6F500B87A2E /* ConfettiView */; };
 		6B7183802D3A4541004C6DEA /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6B71837F2D3A4541004C6DEA /* FirebaseAuth */; };
 		6B7183822D3A4541004C6DEA /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6B7183812D3A4541004C6DEA /* FirebaseCore */; };
 		6B7183842D3A4541004C6DEA /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6B7183832D3A4541004C6DEA /* FirebaseDatabase */; };
@@ -69,6 +70,7 @@
 				6B7183842D3A4541004C6DEA /* FirebaseDatabase in Frameworks */,
 				6B7183862D3A4541004C6DEA /* FirebaseFirestore in Frameworks */,
 				6B5E3A242D40D3E300B87A2E /* SFSymbolsPicker in Frameworks */,
+				6B5E3A272D41B6F500B87A2E /* ConfettiView in Frameworks */,
 				6B7183822D3A4541004C6DEA /* FirebaseCore in Frameworks */,
 				6B7183882D3A4541004C6DEA /* FirebaseFirestoreCombine-Community in Frameworks */,
 				6B7183802D3A4541004C6DEA /* FirebaseAuth in Frameworks */,
@@ -149,6 +151,7 @@
 				6B7183872D3A4541004C6DEA /* FirebaseFirestoreCombine-Community */,
 				6B7183892D3A4541004C6DEA /* FirebaseStorage */,
 				6B5E3A232D40D3E300B87A2E /* SFSymbolsPicker */,
+				6B5E3A262D41B6F500B87A2E /* ConfettiView */,
 			);
 			productName = ExpensesTracker;
 			productReference = 6B7183242D3A3F4D004C6DEA /* ExpensesTracker.app */;
@@ -235,6 +238,7 @@
 			packageReferences = (
 				6B71837E2D3A4541004C6DEA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				6B5E3A212D40D2FB00B87A2E /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */,
+				6B5E3A252D41B63D00B87A2E /* XCRemoteSwiftPackageReference "ConfettiView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6B7183252D3A3F4D004C6DEA /* Products */;
@@ -612,6 +616,14 @@
 				minimumVersion = 1.0.6;
 			};
 		};
+		6B5E3A252D41B63D00B87A2E /* XCRemoteSwiftPackageReference "ConfettiView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/blsage/ConfettiView";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		6B71837E2D3A4541004C6DEA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -627,6 +639,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6B5E3A212D40D2FB00B87A2E /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */;
 			productName = SFSymbolsPicker;
+		};
+		6B5E3A262D41B6F500B87A2E /* ConfettiView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B5E3A252D41B63D00B87A2E /* XCRemoteSwiftPackageReference "ConfettiView" */;
+			productName = ConfettiView;
 		};
 		6B71837F2D3A4541004C6DEA /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,58 +1,81 @@
 import SwiftUI
+import ConfettiView
 
 struct DebtDetailView: View {
     let debt: Debt
     @ObservedObject var viewModel: DebtViewModel
+    @ObservedObject var expenseViewModel: ExpenseViewModel
     @State private var showingPaymentSheet = false
     @State private var selectedInstallment: DebtInstallment?
     @Environment(\.dismiss) private var dismiss
     @State private var showingEditSheet = false
     @State private var showingDeleteAlert = false
+    @State private var showConfetti = false
     
     var body: some View {
-        List {
-            debtInfoSection
-            
-            installmentsSection
-        }
-        .navigationTitle(debt.name)
-        .sheet(isPresented: $showingPaymentSheet) {
-            if let installment = selectedInstallment {
-                RegisterPaymentView(
-                    debt: debt,
-                    installment: installment,
-                    viewModel: viewModel
-                )
+        ZStack {
+            List {
+                debtInfoSection
+                installmentsSection
             }
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button(action: { showingEditSheet = true }) {
-                        Label("Editar Deuda", systemImage: "pencil")
-                    }
-                    
-                    Button(role: .destructive, action: { showingDeleteAlert = true }) {
-                        Label("Eliminar Deuda", systemImage: "trash")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
+            .navigationTitle(debt.name)
+            .sheet(isPresented: $showingPaymentSheet) {
+                if let installment = selectedInstallment {
+                    RegisterPaymentView(
+                        debt: debt,
+                        installment: installment,
+                        viewModel: viewModel,
+                        expenseViewModel: expenseViewModel
+                    )
                 }
             }
-        }
-        .alert("Eliminar Deuda", isPresented: $showingDeleteAlert) {
-            Button("Cancelar", role: .cancel) { }
-            Button("Eliminar", role: .destructive) {
-                viewModel.deleteDebt(debt)
-                dismiss()
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(action: { showingEditSheet = true }) {
+                            Label("Editar Deuda", systemImage: "pencil")
+                        }
+                        
+                        Button(role: .destructive, action: { showingDeleteAlert = true }) {
+                            Label("Eliminar Deuda", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
             }
-        } message: {
-            Text("¿Estás seguro de que quieres eliminar esta deuda? Esta acción no se puede deshacer.")
-        }
-        .sheet(isPresented: $showingEditSheet) {
-            EditDebtView(debt: debt, viewModel: viewModel)
+            .alert("Eliminar Deuda", isPresented: $showingDeleteAlert) {
+                Button("Cancelar", role: .cancel) { }
+                Button("Eliminar", role: .destructive) {
+                    viewModel.deleteDebt(debt)
+                    dismiss()
+                }
+            } message: {
+                Text("¿Estás seguro de que quieres eliminar esta deuda? Esta acción no se puede deshacer.")
+            }
+            .sheet(isPresented: $showingEditSheet) {
+                EditDebtView(debt: debt, viewModel: viewModel)
+            }
+            
+            // Overlay de ConfettiView
+            ConfettiView(isPresented: $showConfetti)
+                .frame(width: 200, height: 200) // Ajusta el tamaño según lo necesites
+                .transition(.opacity)
+                .onChange(of: debt.status) { newValue in
+                    if newValue == .paid {
+                        showConfetti = true
+                    }
+                }
+                .onAppear {
+                    // Verificar si el estado de la deuda es 'pagado' al entrar a la vista
+                    if debt.status == .paid {
+                        showConfetti = true
+                    }
+                }
+                .zIndex(1)  // Asegúrate de que el ConfettiView esté encima
         }
     }
+
     
     private var debtInfoSection: some View {
         Section("Información de la Deuda") {
@@ -173,6 +196,7 @@ struct RegisterPaymentView: View {
     let debt: Debt
     let installment: DebtInstallment
     @ObservedObject var viewModel: DebtViewModel
+    @ObservedObject var expenseViewModel: ExpenseViewModel
     
     @State private var amount: Double?
     @State private var showingAmountField = false
@@ -208,11 +232,34 @@ struct RegisterPaymentView: View {
     }
     
     private func registerPayment() {
-        let paymentAmount = showingAmountField ? amount : installment.amount
-        viewModel.registerPayment(
-            for: debt,
-            installmentNumber: installment.number,
-            amount: paymentAmount
+        let paymentAmount = (showingAmountField ? amount : installment.amount) ?? 0.0
+        
+        // Comprobamos si categoryId está presente
+        guard let categoryId = debt.categoryId else {
+            print("Error: El categoryId de la deuda es nulo.")
+            return
+        }
+        
+        // Crear un gasto asociado al pago
+        let expense = Expense(
+            id: UUID(),
+            amount: paymentAmount,
+            date: Date(),
+            notes: "Pago de deuda: \(debt.name) - Cuota \(installment.number)",
+            categoryId: categoryId // Aquí ya garantizamos que categoryId no es nulo
         )
+        
+        // Llamamos a addExpense una sola vez y guardamos el expenseId
+        if let expenseId = expenseViewModel.addExpense(expense) {
+            // Ahora pasamos el expenseId a registerPayment
+            viewModel.registerPayment(
+                for: debt,
+                installmentNumber: installment.number,
+                amount: paymentAmount,
+                expenseId: expenseId  // Pasamos el ID aquí
+            )
+        } else {
+            print("No se pudo guardar el gasto.")
+        }
     }
 }

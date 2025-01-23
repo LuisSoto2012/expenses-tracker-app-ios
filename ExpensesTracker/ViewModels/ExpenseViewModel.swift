@@ -45,9 +45,9 @@ class ExpenseViewModel: ObservableObject {
     
     // MARK: - Expense Methods
     
-    func addExpense(_ expense: Expense) {
-            firebaseService.saveExpense(expense)
-        }
+    func addExpense(_ expense: Expense) -> UUID? {
+        return firebaseService.saveExpense(expense)
+    }
         
     func deleteExpense(_ expense: Expense) {
         firebaseService.deleteExpense(id: expense.id)

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ExpensesView: View {
     @EnvironmentObject private var expenseViewModel: ExpenseViewModel
+    @EnvironmentObject private var debtViewModel: DebtViewModel
     @State private var showingAddExpense = false
     @State private var selectedMonth = Date()
     @State private var selectedCategoryId: UUID?
@@ -84,6 +85,13 @@ struct ExpensesView: View {
     private func deleteExpense(at offsets: IndexSet) {
         offsets.forEach { index in
             let expense = filteredExpenses[index]
+            
+            // Eliminar el pago de deuda asociado
+            if let associatedDebtInstallment = debtViewModel.getInstallment(for: expense) {
+                debtViewModel.undoPayment(for: debt, installmentNumber: associatedDebtInstallment.number)
+            }
+            
+            // Eliminar el gasto
             expenseViewModel.deleteExpense(expense)
         }
     }
