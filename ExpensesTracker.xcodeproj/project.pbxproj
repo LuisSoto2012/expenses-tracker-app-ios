@@ -17,6 +17,7 @@
 		6B71838F2D3CB331004C6DEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B71838E2D3CB331004C6DEA /* GoogleService-Info.plist */; };
 		6B7183902D3CB331004C6DEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B71838E2D3CB331004C6DEA /* GoogleService-Info.plist */; };
 		6B7183912D3CB331004C6DEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B71838E2D3CB331004C6DEA /* GoogleService-Info.plist */; };
+		6B7CBB982D434A5100376011 /* ConfettiView in Frameworks */ = {isa = PBXBuildFile; productRef = 6B7CBB972D434A5100376011 /* ConfettiView */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +70,7 @@
 				6B7183842D3A4541004C6DEA /* FirebaseDatabase in Frameworks */,
 				6B7183862D3A4541004C6DEA /* FirebaseFirestore in Frameworks */,
 				6B5E3A242D40D3E300B87A2E /* SFSymbolsPicker in Frameworks */,
+				6B7CBB982D434A5100376011 /* ConfettiView in Frameworks */,
 				6B7183822D3A4541004C6DEA /* FirebaseCore in Frameworks */,
 				6B7183882D3A4541004C6DEA /* FirebaseFirestoreCombine-Community in Frameworks */,
 				6B7183802D3A4541004C6DEA /* FirebaseAuth in Frameworks */,
@@ -149,6 +151,7 @@
 				6B7183872D3A4541004C6DEA /* FirebaseFirestoreCombine-Community */,
 				6B7183892D3A4541004C6DEA /* FirebaseStorage */,
 				6B5E3A232D40D3E300B87A2E /* SFSymbolsPicker */,
+				6B7CBB972D434A5100376011 /* ConfettiView */,
 			);
 			productName = ExpensesTracker;
 			productReference = 6B7183242D3A3F4D004C6DEA /* ExpensesTracker.app */;
@@ -235,6 +238,7 @@
 			packageReferences = (
 				6B71837E2D3A4541004C6DEA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				6B5E3A212D40D2FB00B87A2E /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */,
+				6B7CBB962D4349AE00376011 /* XCRemoteSwiftPackageReference "ConfettiView" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6B7183252D3A3F4D004C6DEA /* Products */;
@@ -620,6 +624,14 @@
 				minimumVersion = 11.7.0;
 			};
 		};
+		6B7CBB962D4349AE00376011 /* XCRemoteSwiftPackageReference "ConfettiView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/blsage/ConfettiView";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -657,6 +669,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6B71837E2D3A4541004C6DEA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		6B7CBB972D434A5100376011 /* ConfettiView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B7CBB962D4349AE00376011 /* XCRemoteSwiftPackageReference "ConfettiView" */;
+			productName = ConfettiView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

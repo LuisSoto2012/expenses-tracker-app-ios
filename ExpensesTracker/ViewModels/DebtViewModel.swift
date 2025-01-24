@@ -14,7 +14,7 @@ class DebtViewModel: ObservableObject {
     }
     
     private func setupListener() {
-        firebaseService.observeDebts { [weak self] debts in
+        firebaseService.syncDebts { [weak self] debts in
             self?.debts = debts
         }
     }
@@ -39,13 +39,7 @@ class DebtViewModel: ObservableObject {
     }
     
     func addDebt(_ debt: Debt) {
-        Task {
-            do {
-                try await firebaseService.addDebt(debt)
-            } catch {
-                print("Error adding debt: \(error)")
-            }
-        }
+        firebaseService.saveDebt(debt)
     }
     
     func updateDebt(_ debt: Debt, with updates: (inout Debt) -> Void) {
@@ -53,23 +47,11 @@ class DebtViewModel: ObservableObject {
         updates(&updatedDebt)
         updatedDebt.lastModified = Date()
         
-        Task {
-            do {
-                try await firebaseService.updateDebt(updatedDebt)
-            } catch {
-                print("Error updating debt: \(error)")
-            }
-        }
+        firebaseService.updateDebt(updatedDebt)
     }
     
     func deleteDebt(_ debt: Debt) {
-        Task {
-            do {
-                try await firebaseService.deleteDebt(debt)
-            } catch {
-                print("Error deleting debt: \(error)")
-            }
-        }
+        firebaseService.deleteDebt(id: debt.id)
     }
     
     func registerPayment(for debt: Debt, installmentNumber: Int, amount: Double?) {
@@ -85,13 +67,7 @@ class DebtViewModel: ObservableObject {
         
         updatedDebt.lastModified = Date()
         
-        Task {
-            do {
-                try await firebaseService.updateDebt(updatedDebt)
-            } catch {
-                print("Error registering payment: \(error)")
-            }
-        }
+        firebaseService.updateDebt(updatedDebt)
     }
     
     func undoPayment(for debt: Debt, installmentNumber: Int) {
@@ -103,13 +79,7 @@ class DebtViewModel: ObservableObject {
         updatedDebt.status = .pending
         updatedDebt.lastModified = Date()
         
-        Task {
-            do {
-                try await firebaseService.updateDebt(updatedDebt)
-            } catch {
-                print("Error undoing payment: \(error)")
-            }
-        }
+        firebaseService.updateDebt(updatedDebt)
     }
     
     func sortedDebts(by criteria: SortCriteria) -> [Debt] {

@@ -111,96 +111,49 @@ class FirebaseService: ObservableObject {
     }
     
     // MARK: - Debt Management
-    func observeDebts(completion: @escaping ([Debt]) -> Void) {
+    func syncDebts(completion: @escaping ([Debt]) -> Void) {
         let listener = db.collection("debts")
-            .order(by: "creationDate", descending: true)
             .addSnapshotListener { snapshot, error in
-                if let error = error {
-                    print("Error fetching debts: \(error)")
-                    return
-                }
-                
                 guard let documents = snapshot?.documents else {
-                    completion([])
+                    print("Error fetching debts: \(error?.localizedDescription ?? "Unknown error")")
                     return
                 }
                 
                 let debts = documents.compactMap { document -> Debt? in
-                    guard let firebaseDebt = try? document.data(as: Debt.FirebaseDebt.self) else { return nil }
-                    return firebaseDebt.toDebt()
+                    try? document.data(as: Debt.self)
                 }
                 completion(debts)
             }
         listeners.append(listener)
     }
     
-    func addDebt(_ debt: Debt) async throws {
-        var newDebt = debt
-        newDebt.createdBy = Auth.auth().currentUser?.uid ?? ""
-        let firebaseDebt = Debt.FirebaseDebt(from: newDebt)
-        _ = try db.collection("debts").addDocument(from: firebaseDebt)
+    func saveDebt(_ debt: Debt) {
+        do {
+            try db.collection("debts")
+                .document(debt.id.uuidString)
+                .setData(from: debt)
+        } catch {
+            print("Error saving debt: \(error.localizedDescription)")
+        }
     }
     
-    func updateDebt(_ debt: Debt) async throws {
-        guard let id = debt.id else { return }
-        let firebaseDebt = Debt.FirebaseDebt(from: debt)
-        try db.collection("debts").document(id).setData(from: firebaseDebt)
+    func updateDebt(_ debt: Debt) {
+        do {
+            try db.collection("debts")
+                .document(debt.id.uuidString)
+                .setData(from: debt)
+        } catch {
+            print("Error updating debt: \(error.localizedDescription)")
+        }
     }
     
-    func deleteDebt(_ debt: Debt) async throws {
-        guard let id = debt.id else { return }
-        try await db.collection("debts").document(id).delete()
-    }
-}
-
-// Add this extension to handle Firebase-specific debt mapping
-private extension Debt {
-    // For Firebase storage
-    struct FirebaseDebt: Codable {
-        @DocumentID var id: String?
-        var name: String
-        var totalAmount: Double
-        var numberOfInstallments: Int
-        var startDate: Date
-        var status: DebtStatus
-        var installments: [DebtInstallment]
-        var description: String?
-        var sharedWithPartner: Bool
-        var createdBy: String
-        var creationDate: Date
-        var lastModified: Date?
-        
-        init(from debt: Debt) {
-            self.id = debt.id
-            self.name = debt.name
-            self.totalAmount = debt.totalAmount
-            self.numberOfInstallments = debt.numberOfInstallments
-            self.startDate = debt.startDate
-            self.status = debt.status
-            self.installments = debt.installments
-            self.description = debt.description
-            self.sharedWithPartner = debt.sharedWithPartner
-            self.createdBy = debt.createdBy
-            self.lastModified = nil
-            self.creationDate = Date()
-        }
-        
-        func toDebt() -> Debt {
-            var debt = Debt(
-                name: name,
-                totalAmount: totalAmount,
-                numberOfInstallments: numberOfInstallments,
-                startDate: startDate,
-                description: description,
-                sharedWithPartner: sharedWithPartner
-            )
-            debt.id = id
-            debt.status = status
-            debt.installments = installments
-            debt.createdBy = createdBy
-            debt.creationDate = creationDate
-            debt.lastModified = lastModified
-            return debt
-        }
+    func deleteDebt(id: UUID) {
+        db.collection("debts")
+            .document(id.uuidString)
+            .delete { error in
+                if let error = error {
+                    print("Error deleting debt: \(error.localizedDescription)")
+                }
+            }
     }
 }

@@ -1,7 +1,7 @@
 import Foundation
 
 struct Debt: Identifiable, Codable {
-    var id: String?
+    var id: UUID
     var name: String
     var totalAmount: Double
     var numberOfInstallments: Int
@@ -18,6 +18,7 @@ struct Debt: Identifiable, Codable {
     }
     
     init(
+        id: UUID = UUID(),
         name: String,
         totalAmount: Double,
         numberOfInstallments: Int,
@@ -25,6 +26,7 @@ struct Debt: Identifiable, Codable {
         description: String? = nil,
         sharedWithPartner: Bool = false
     ) {
+        self.id = id
         self.name = name
         self.totalAmount = totalAmount
         self.numberOfInstallments = numberOfInstallments

@@ -1,5 +1,5 @@
 {
-  "originHash" : "267e2730cf57f2bd4b0e2d8fcef9a44e55d48c83e7da42b4954a11327bd2ca9a",
+  "originHash" : "71afa4868f458fdcd5543729852e9ed566459837b356509fd1abd2c2a5beebe3",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -17,6 +17,15 @@
       "state" : {
         "revision" : "61b85103a1aeed8218f17c794687781505fbbef5",
         "version" : "11.2.0"
+      }
+    },
+    {
+      "identity" : "confettiview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/blsage/ConfettiView",
+      "state" : {
+        "branch" : "main",
+        "revision" : "4ffb2bc6c0fc3c24b4117e0a0491ed682ea8abe8"
       }
     },
     {

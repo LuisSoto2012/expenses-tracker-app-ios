@@ -1,4 +1,5 @@
 import SwiftUI
+import ConfettiView
 
 struct DebtDetailView: View {
     let debt: Debt
@@ -8,49 +9,68 @@ struct DebtDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showingEditSheet = false
     @State private var showingDeleteAlert = false
+    @State private var showConfetti = false
     
     var body: some View {
-        List {
-            debtInfoSection
-            
-            installmentsSection
-        }
-        .navigationTitle(debt.name)
-        .sheet(isPresented: $showingPaymentSheet) {
-            if let installment = selectedInstallment {
-                RegisterPaymentView(
-                    debt: debt,
-                    installment: installment,
-                    viewModel: viewModel
-                )
+        ZStack {
+            List {
+                debtInfoSection
+                installmentsSection
             }
-        }
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button(action: { showingEditSheet = true }) {
-                        Label("Editar Deuda", systemImage: "pencil")
-                    }
-                    
-                    Button(role: .destructive, action: { showingDeleteAlert = true }) {
-                        Label("Eliminar Deuda", systemImage: "trash")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
+            .navigationTitle(debt.name)
+            .sheet(isPresented: $showingPaymentSheet) {
+                if let installment = selectedInstallment {
+                    RegisterPaymentView(
+                        debt: debt,
+                        installment: installment,
+                        viewModel: viewModel
+                    )
                 }
             }
-        }
-        .alert("Eliminar Deuda", isPresented: $showingDeleteAlert) {
-            Button("Cancelar", role: .cancel) { }
-            Button("Eliminar", role: .destructive) {
-                viewModel.deleteDebt(debt)
-                dismiss()
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(action: { showingEditSheet = true }) {
+                            Label("Editar Deuda", systemImage: "pencil")
+                        }
+                        
+                        Button(role: .destructive, action: { showingDeleteAlert = true }) {
+                            Label("Eliminar Deuda", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
             }
-        } message: {
-            Text("¿Estás seguro de que quieres eliminar esta deuda? Esta acción no se puede deshacer.")
-        }
-        .sheet(isPresented: $showingEditSheet) {
-            EditDebtView(debt: debt, viewModel: viewModel)
+            .alert("Eliminar Deuda", isPresented: $showingDeleteAlert) {
+                Button("Cancelar", role: .cancel) { }
+                Button("Eliminar", role: .destructive) {
+                    viewModel.deleteDebt(debt)
+                    dismiss()
+                }
+            } message: {
+                Text("¿Estás seguro de que quieres eliminar esta deuda? Esta acción no se puede deshacer.")
+            }
+            .sheet(isPresented: $showingEditSheet) {
+                EditDebtView(debt: debt, viewModel: viewModel)
+            }
+            
+            // Overlay de ConfettiView
+            ConfettiView(isPresented: $showConfetti)
+                .frame(width: 200, height: 200) // Ajusta el tamaño según lo necesites
+                .transition(.opacity)
+                .onChange(of: debt.status) { newValue in
+                    if newValue == .paid {
+                        showConfetti = true
+                    }
+                }
+                .onAppear {
+                    // Verificar si el estado de la deuda es 'pagado' al entrar a la vista
+                    if debt.status == .paid {
+                        showConfetti = true
+                    }
+                }
+                .zIndex(1)  // Asegúrate de que el ConfettiView esté encima
         }
     }
     
