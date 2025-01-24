@@ -46,8 +46,47 @@ class ExpenseViewModel: ObservableObject {
     // MARK: - Expense Methods
     
     func addExpense(_ expense: Expense) {
+        firebaseService.saveExpense(expense)
+    }
+    
+    func addRecurringExpense(_ expense: Expense, endDate: Date) {
+        guard let recurrenceInterval = expense.recurrenceInterval else { return }
+            
+        var currentDate = expense.date
+        var expenses: [Expense] = []
+        
+        while currentDate <= endDate {
+            let newExpense = Expense(
+                id: UUID(),
+                name: expense.name,
+                amount: expense.amount,
+                date: currentDate,
+                notes: expense.notes,
+                categoryId: expense.categoryId,
+                isRecurring: expense.isRecurring,
+                recurrenceInterval: expense.recurrenceInterval,
+                isFixed: expense.isFixed
+            )
+            expenses.append(newExpense)
+            
+            // Increment currentDate based on the recurrence interval
+            switch recurrenceInterval {
+            case .daily:
+                currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
+            case .weekly:
+                currentDate = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: currentDate) ?? currentDate
+            case .monthly:
+                currentDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
+            case .yearly:
+                currentDate = Calendar.current.date(byAdding: .year, value: 1, to: currentDate) ?? currentDate
+            }
+        }
+        
+        // Save all expenses to Firestore
+        for expense in expenses {
             firebaseService.saveExpense(expense)
         }
+    }
         
     func deleteExpense(_ expense: Expense) {
         firebaseService.deleteExpense(id: expense.id)

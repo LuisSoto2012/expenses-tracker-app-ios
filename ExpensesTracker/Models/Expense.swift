@@ -2,6 +2,7 @@ import Foundation
 
 struct Expense: Identifiable, Equatable, Codable {
     let id: UUID
+    var name: String
     var amount: Double
     var date: Date
     var notes: String?
@@ -9,9 +10,11 @@ struct Expense: Identifiable, Equatable, Codable {
     var isRecurring: Bool
     var recurrenceInterval: RecurrenceInterval?
     var isFixed: Bool?
+    var isPaid: Bool?
     
     init(
         id: UUID = UUID(),
+        name: String,
         amount: Double,
         date: Date = Date(),
         notes: String? = nil,
@@ -21,6 +24,7 @@ struct Expense: Identifiable, Equatable, Codable {
         isFixed: Bool? = nil
     ) {
         self.id = id
+        self.name = name
         self.amount = amount
         self.date = date
         self.notes = notes
@@ -32,6 +36,7 @@ struct Expense: Identifiable, Equatable, Codable {
     
     static func == (lhs: Expense, rhs: Expense) -> Bool {
         return lhs.id == rhs.id &&
+               lhs.name == rhs.name &&
                lhs.amount == rhs.amount &&
                lhs.date == rhs.date &&
                lhs.notes == rhs.notes &&
@@ -43,8 +48,8 @@ struct Expense: Identifiable, Equatable, Codable {
 }
 
 enum RecurrenceInterval: String, Codable {
-    case daily
-    case weekly
-    case monthly
-    case yearly
+    case daily = "Diario"
+    case weekly = "Semanal"
+    case monthly = "Mensual"
+    case yearly = "Anual"
 } 

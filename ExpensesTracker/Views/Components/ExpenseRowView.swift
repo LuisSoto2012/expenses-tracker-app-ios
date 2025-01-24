@@ -90,6 +90,7 @@ struct ExpenseRowView: View {
 
 #Preview {
     ExpenseRowView(expense: Expense(
+        name: "Compra de supermercado",
         amount: 42.50,
         notes: "Compra de supermercado",
         categoryId: Category.defaults[0].id,
