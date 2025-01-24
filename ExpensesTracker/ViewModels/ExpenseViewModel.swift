@@ -169,6 +169,15 @@ class ExpenseViewModel: ObservableObject {
         .sorted { $0.date > $1.date }
     }
     
+    func getFilteredExpenses(day: Date, categoryId: UUID?) -> [Expense] {
+        let calendar = Calendar.current
+        return expenses.filter { expense in
+            let isSameDay = calendar.isDate(expense.date, inSameDayAs: day)
+            let matchesCategory = categoryId == nil || expense.categoryId == categoryId
+            return matchesCategory && isSameDay
+        }
+    }
+    
     func getBudgetProgress(for categoryId: UUID, month: Date) -> Double {
         guard let budget = getBudget(for: categoryId, month: month) else { return 0 }
         let spending = getMonthlyExpensesByCategory(for: month)
