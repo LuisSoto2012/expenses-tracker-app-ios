@@ -4,6 +4,7 @@ struct AddExpenseView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var expenseViewModel: ExpenseViewModel
     
+    @State private var name: String = ""
     @State private var amount: Double = 0.0
     @State private var notes: String = ""
     @State private var date = Date()
@@ -11,10 +12,18 @@ struct AddExpenseView: View {
     @State private var isRecurring = false
     @State private var recurrenceInterval: RecurrenceInterval = .monthly
     @State private var isFixed = false
+    @State private var endDate = Date()
     
     var body: some View {
         NavigationView {
             Form {
+                // Name Section
+                Section {
+                    TextField("Nombre", text: $name)
+                } header: {
+                    Text("Nombre")
+                }
+                
                 // Amount Section
                 Section {
                     TextField("Monto", value: $amount, formatter: CurrencyFormatter.pen)
@@ -61,6 +70,7 @@ struct AddExpenseView: View {
                             Text("Mensual").tag(RecurrenceInterval.monthly)
                             Text("Anual").tag(RecurrenceInterval.yearly)
                         }
+                        DatePicker("Fecha Fin", selection: $endDate, displayedComponents: .date)
                         
                         Toggle("Monto Fijo", isOn: $isFixed)
                     }
@@ -96,6 +106,7 @@ struct AddExpenseView: View {
         }
         
         let expense = Expense(
+            name: name,
             amount: amount,
             date: date,
             notes: notes.isEmpty ? nil : notes,
@@ -105,7 +116,11 @@ struct AddExpenseView: View {
             isFixed: isRecurring ? isFixed : nil
         )
         
-        expenseViewModel.addExpense(expense)
+        if isRecurring {
+            expenseViewModel.addRecurringExpense(expense, endDate: endDate)
+        } else {
+            expenseViewModel.addExpense(expense)
+        }
         dismiss()
     }
 }
