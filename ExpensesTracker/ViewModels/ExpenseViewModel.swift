@@ -152,7 +152,7 @@ class ExpenseViewModel: ObservableObject {
     
     // MARK: - Helper Methods
     
-    func getFilteredExpenses(month: Date, categoryId: UUID?) -> [Expense] {
+    func getFilteredExpenses(month: Date, categoryId: UUID?, isRecurring: Bool = false) -> [Expense] {
         let calendar = Calendar.current
         let monthComponent = calendar.component(.month, from: month)
         let yearComponent = calendar.component(.year, from: month)
@@ -163,8 +163,11 @@ class ExpenseViewModel: ObservableObject {
             
             let monthMatches = expenseMonth == monthComponent && expenseYear == yearComponent
             let categoryMatches = categoryId == nil || expense.categoryId == categoryId
+                    
+            // Verificar si el gasto es recurrente, si corresponde
+            let recurringMatches = isRecurring == expense.isRecurring
             
-            return monthMatches && categoryMatches
+            return monthMatches && categoryMatches && recurringMatches
         }
         .sorted { $0.date > $1.date }
     }
@@ -248,4 +251,31 @@ class ExpenseViewModel: ObservableObject {
             }
             .reduce(0) { $0 + $1.amount }
     }
-} 
+    
+    func getRecurringExpenses(forMonth month: Int, year: Int) -> [Expense] {
+        expenses.filter { expense in
+            let isRecurring = expense.isRecurring
+            let expenseDate = expense.date
+            let expenseMonth = Calendar.current.component(.month, from: expenseDate)
+            let expenseYear = Calendar.current.component(.year, from: expenseDate)
+            return isRecurring && expenseMonth == month && expenseYear == year
+        }
+    }
+
+    func markAsPaid(expenseId: UUID) {
+        guard let index = expenses.firstIndex(where: { $0.id == expenseId }) else { return }
+        
+        // Crear una copia del gasto con el estado actualizado
+        var updatedExpense = expenses[index]
+        updatedExpense.isPaid = true
+        
+        // Actualizar el estado en Firebase
+        firebaseService.saveExpense(updatedExpense)
+        
+        // Actualizar el estado local
+        expenses[index] = updatedExpense
+        
+        // Recalcular el total mensual (si aplica)
+        calculateTotalMonthlyExpenses()
+    }
+}
