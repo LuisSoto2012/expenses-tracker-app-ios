@@ -6,6 +6,8 @@ struct ExpenseRowView: View {
     @State private var showDeleteConfirmation = false
     @State private var expenseToDelete: Expense?
     @State private var isLoadingPayment = false
+    @State private var showEditSheet = false
+    @State private var newAmount: Double = 0.0
     
     private var category: Category? {
         expenseViewModel.categories.first { $0.id == expense.categoryId }
@@ -120,6 +122,75 @@ struct ExpenseRowView: View {
             } label: {
                 Label("Eliminar", systemImage: "trash")
             }
+        }
+        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+            if expense.isRecurring {
+                Button {
+                    newAmount = expense.amount
+                    showEditSheet = true
+                } label: {
+                    Label("Editar", systemImage: "pencil")
+                }
+                .tint(.blue)
+            }
+        }
+        .sheet(isPresented: $showEditSheet) {
+            VStack(spacing: 24) {
+                // Título del sheet
+                Text("Editar Monto (S/.)")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .padding(.top, 40)
+                
+                // Campo de texto para ingresar el monto
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Monto:")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    
+                    TextField("Ingrese el monto", value: $newAmount, formatter: CurrencyFormatter.pen)
+                        .textFieldStyle(.roundedBorder)
+                        .keyboardType(.decimalPad)
+                        .padding(.horizontal, 16)
+                }
+                
+                Spacer()
+                
+                // Botones para Cancelar y Guardar
+                HStack(spacing: 16) {
+                    Button(action: {
+                        showEditSheet = false
+                    }) {
+                        Text("Cancelar")
+                            .font(.body)
+                            .fontWeight(.medium)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(8)
+                    }
+                    
+                    Button(action: {
+                        expenseViewModel.updateExpense(expense, newAmount: newAmount)
+                        showEditSheet = false
+                    }) {
+                        Text("Guardar")
+                            .font(.body)
+                            .fontWeight(.medium)
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                    }
+                }
+                .padding(.horizontal, 16)
+                
+                Spacer()
+            }
+            .padding()
+            .presentationDetents([.height(250), .medium])
+            .presentationDragIndicator(.visible)
         }
         .alert(isPresented: $showDeleteConfirmation) {
             Alert(

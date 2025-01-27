@@ -87,9 +87,49 @@ class ExpenseViewModel: ObservableObject {
             firebaseService.saveExpense(expense)
         }
     }
+    
+    func updateExpense(_ expense: Expense, newAmount: Double) {
+        guard let index = expenses.firstIndex(where: { $0.id == expense.id }) else { return }
+        
+        // Crear una copia del gasto con la nueva cantidad
+        var updatedExpense = expenses[index]
+        updatedExpense.amount = newAmount
+        
+        // Guardar los cambios en Firebase
+        firebaseService.saveExpense(updatedExpense)
+        
+        // Actualizar la lista local de gastos
+        expenses[index] = updatedExpense
+        
+        // Recalcular el total mensual de gastos (si aplica)
+        calculateTotalMonthlyExpenses()
+    }
         
     func deleteExpense(_ expense: Expense) {
         firebaseService.deleteExpense(id: expense.id)
+    }
+    
+    func getRecentExpenses() -> [Expense] {
+        return expenses.filter { expense in
+            if expense.isRecurring {
+                return expense.isPaid ?? false // Solo mostrar recurrentes si están pagadas
+            } else {
+                return true // Mostrar todos los gastos no recurrentes
+            }
+        }
+        .sorted { $0.date > $1.date } // Ordenar por fecha descendente
+    }
+    
+    func reloadExpenses() {
+        isLoading = true
+
+        firebaseService.syncExpenses { [weak self] expenses in
+            DispatchQueue.main.async {
+                self?.expenses = expenses
+                self?.calculateTotalMonthlyExpenses()
+                self?.isLoading = false
+            }
+        }
     }
     
     // MARK: - Category Methods
