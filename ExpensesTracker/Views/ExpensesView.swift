@@ -96,6 +96,9 @@ struct ExpensesView: View {
                     }
                     .onDelete(perform: deleteExpense)
                 }
+                .refreshable {
+                    expenseViewModel.reloadExpenses()
+                }
                 .listStyle(.plain)
             }
             .navigationTitle(selectedOption == .general ? "Gastos Generales" : "Gastos Recurrentes")

@@ -22,6 +22,10 @@ struct DebtDashboardView: View {
                     }
                 }
             }
+            // Pull-to-Refresh
+            .refreshable {
+                viewModel.reloadDebts()
+            }
             .sheet(isPresented: $showingAddDebt) {
                 AddDebtView(viewModel: viewModel)
             }

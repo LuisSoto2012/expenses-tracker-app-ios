@@ -239,8 +239,11 @@ class ExpenseViewModel: ObservableObject {
             let expenseMonth = calendar.component(.month, from: expense.date)
             let expenseYear = calendar.component(.year, from: expense.date)
             
+            // Considerar los montos solo si no es recurrente o si es recurrente y está pagado
             if expenseMonth == month && expenseYear == year {
-                categoryTotals[expense.categoryId, default: 0] += expense.amount
+                if !expense.isRecurring || (expense.isRecurring && (expense.isPaid ?? false)) {
+                    categoryTotals[expense.categoryId, default: 0] += expense.amount
+                }
             }
         }
         
@@ -272,7 +275,8 @@ class ExpenseViewModel: ObservableObject {
             .filter { expense in
                 let expenseMonth = calendar.component(.month, from: expense.date)
                 let expenseYear = calendar.component(.year, from: expense.date)
-                return expenseMonth == month && expenseYear == year
+                return expenseMonth == month && expenseYear == year &&
+                    (!expense.isRecurring || (expense.isRecurring && (expense.isPaid ?? false)))
             }
             .reduce(0) { $0 + $1.amount }
     }
@@ -287,7 +291,8 @@ class ExpenseViewModel: ObservableObject {
             .filter { expense in
                 let expenseMonth = calendar.component(.month, from: expense.date)
                 let expenseYear = calendar.component(.year, from: expense.date)
-                return expenseMonth == currentMonth && expenseYear == currentYear
+                return expenseMonth == currentMonth && expenseYear == currentYear &&
+                    (!expense.isRecurring || (expense.isRecurring && (expense.isPaid ?? false)))
             }
             .reduce(0) { $0 + $1.amount }
     }
