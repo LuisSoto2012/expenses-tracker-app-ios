@@ -3,6 +3,7 @@ import SwiftUI
 struct AddExpenseView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var expenseViewModel: ExpenseViewModel
+    @EnvironmentObject private var incomeViewModel: IncomeViewModel
     
     @State private var name: String = ""
     @State private var amount: Double = 0.0
@@ -13,6 +14,7 @@ struct AddExpenseView: View {
     @State private var recurrenceInterval: RecurrenceInterval = .monthly
     @State private var isFixed = false
     @State private var endDate = Date()
+    @State private var selectedPaymentMethod: PaymentMethod?
     
     var body: some View {
         NavigationView {
@@ -57,6 +59,26 @@ struct AddExpenseView: View {
                     TextField("Notas", text: $notes)
                 } header: {
                     Text("Detalles")
+                }
+                
+                Section("Payment Method") {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        LazyHStack(spacing: 15) {
+                            ForEach(incomeViewModel.paymentMethods) { method in
+                                PaymentMethodCard(paymentMethod: method)
+                                    .frame(width: 250, height: 150)
+                                    .onTapGesture {
+                                        selectedPaymentMethod = method
+                                    }
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .stroke(selectedPaymentMethod?.id == method.id ? Color.white : Color.clear, lineWidth: 3)
+                                    )
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .frame(height: 170)
                 }
                 
                 // Recurring Expense Section
@@ -113,7 +135,8 @@ struct AddExpenseView: View {
             categoryId: categoryId,
             isRecurring: isRecurring,
             recurrenceInterval: isRecurring ? recurrenceInterval : nil,
-            isFixed: isRecurring ? isFixed : nil
+            isFixed: isRecurring ? isFixed : nil,
+            paymentMethodId: selectedPaymentMethod?.id
         )
         
         if isRecurring {

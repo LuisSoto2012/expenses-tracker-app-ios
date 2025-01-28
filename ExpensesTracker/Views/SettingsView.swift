@@ -4,6 +4,7 @@ import SFSymbolsPicker
 
 struct SettingsView: View {
     @EnvironmentObject var expenseViewModel: ExpenseViewModel
+    @StateObject private var incomeViewModel = IncomeViewModel()
     @State private var showingCategorySheet = false
     @State private var showingExportSheet = false
     @State private var showingSignOutAlert = false
@@ -11,6 +12,17 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             List {
+                // Incomes section
+                Section("Income & Payments") {
+                    NavigationLink(destination: IncomeListView(viewModel: incomeViewModel)) {
+                        Label("Income Sources", systemImage: "dollarsign.circle")
+                    }
+                    
+                    NavigationLink(destination: PaymentMethodsView(viewModel: incomeViewModel)) {
+                        Label("Payment Methods", systemImage: "creditcard")
+                    }
+                }
+                
                 // Categories Section
                 Section("Categorías") {
                     Button(action: { showingCategorySheet = true }) {
