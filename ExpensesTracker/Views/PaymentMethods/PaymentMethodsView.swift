@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PaymentMethodsView: View {
     @ObservedObject var viewModel: IncomeViewModel
+    @State private var paymentMethodToDelete: PaymentMethod?
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -10,11 +11,9 @@ struct PaymentMethodsView: View {
                     PaymentMethodCard(paymentMethod: method)
                         .contextMenu {
                             Button(role: .destructive) {
-                                if let index = viewModel.paymentMethods.firstIndex(where: { $0.id == method.id }) {
-                                    viewModel.deletePaymentMethod(at: IndexSet(integer: index))
-                                }
+                                deletePaymentMethod(method)
                             } label: {
-                                Label("Delete", systemImage: "trash")
+                                Label("Eliminar", systemImage: "trash")
                             }
                         }
                 }
@@ -22,7 +21,7 @@ struct PaymentMethodsView: View {
             .padding()
         }
         .frame(height: 200)
-        .navigationTitle("Payment Methods")
+        .navigationTitle("Metodos de Pago")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { viewModel.showingAddPaymentMethod = true }) {
@@ -33,6 +32,25 @@ struct PaymentMethodsView: View {
         .sheet(isPresented: $viewModel.showingAddPaymentMethod) {
             AddPaymentMethodView(viewModel: viewModel)
         }
+        .confirmationDialog("Eliminar Metodo de Pago", isPresented: Binding(
+            get: { paymentMethodToDelete != nil },
+            set: { _ in paymentMethodToDelete = nil }
+        ), actions: {
+            Button("Eliminar", role: .destructive) {
+                if let method = paymentMethodToDelete,
+                   let index = viewModel.paymentMethods.firstIndex(where: { $0.id == method.id }) {
+                    viewModel.deletePaymentMethod(at: IndexSet(integer: index))
+                }
+                paymentMethodToDelete = nil // Limpiar el estado después de eliminar
+            }
+            Button("Cancelar", role: .cancel) {}
+        }, message: {
+            Text("¿Estas seguro de eliminar este metodo de pago?")
+        })
+    }
+    
+    private func deletePaymentMethod(_ method: PaymentMethod) {
+        paymentMethodToDelete = method
     }
 }
 
@@ -72,4 +90,4 @@ struct PaymentMethodCard: View {
         .cornerRadius(15)
         .shadow(radius: 5)
     }
-} 
+}

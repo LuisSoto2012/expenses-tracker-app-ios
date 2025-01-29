@@ -13,24 +13,24 @@ struct AddIncomeView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Income Details") {
-                    TextField("Name", text: $name)
-                    Picker("Type", selection: $type) {
+                Section("Detalles de Ingreso") {
+                    TextField("Nombre", text: $name)
+                    Picker("Tipo", selection: $type) {
                         ForEach(IncomeType.allCases, id: \.self) { type in
                             Text(type.rawValue).tag(type)
                         }
                     }
-                    TextField("Amount", text: $amount)
+                    TextField("Monto", value: $amount, formatter: CurrencyFormatter.pen)
                         .keyboardType(.decimalPad)
-                    Picker("Frequency", selection: $frequency) {
+                    Picker("Frequencia", selection: $frequency) {
                         ForEach(IncomeFrequency.allCases, id: \.self) { frequency in
                             Text(frequency.rawValue).tag(frequency)
                         }
                     }
                 }
                 
-                Section("Payment Method") {
-                    Picker("Payment Method", selection: $selectedPaymentMethodId) {
+                Section("Metodo de Pago") {
+                    Picker("Metodo de Pago", selection: $selectedPaymentMethodId) {
                         Text("None").tag(nil as UUID?)
                         ForEach(viewModel.paymentMethods) { method in
                             Text(method.name).tag(method.id as UUID?)
@@ -38,13 +38,13 @@ struct AddIncomeView: View {
                     }
                 }
             }
-            .navigationTitle("Add Income")
+            .navigationTitle("Agregar Ingreso")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancelar") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+                    Button("Guardar") {
                         saveIncome()
                         dismiss()
                     }

@@ -15,11 +15,11 @@ struct SettingsView: View {
                 // Incomes section
                 Section("Income & Payments") {
                     NavigationLink(destination: IncomeListView(viewModel: incomeViewModel)) {
-                        Label("Income Sources", systemImage: "dollarsign.circle")
+                        Label("Fuente de Ingresos", systemImage: "dollarsign.circle")
                     }
                     
                     NavigationLink(destination: PaymentMethodsView(viewModel: incomeViewModel)) {
-                        Label("Payment Methods", systemImage: "creditcard")
+                        Label("Metodos de Pago", systemImage: "creditcard")
                     }
                 }
                 

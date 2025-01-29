@@ -156,4 +156,69 @@ class FirebaseService: ObservableObject {
                 }
             }
     }
+    
+    // Incomes
+    func syncIncomes(completion: @escaping ([Income]) -> Void) {
+        let listener = db.collection("incomes")
+            .addSnapshotListener { snapshot, error in
+                guard let documents = snapshot?.documents else {
+                    print("Error fetching incomes: \(error?.localizedDescription ?? "Unknown error")")
+                    return
+                }
+                
+                let incomes = documents.compactMap { document -> Income? in
+                    try? document.data(as: Income.self)
+                }
+                completion(incomes)
+            }
+        listeners.append(listener)
+    }
+    
+    func syncPaymentMethods(completion: @escaping ([PaymentMethod]) -> Void) {
+        let listener = db.collection("paymentMethods")
+            .addSnapshotListener { snapshot, error in
+                guard let documents = snapshot?.documents else {
+                    print("Error fetching payment methods: \(error?.localizedDescription ?? "Unknown error")")
+                    return
+                }
+                
+                let paymentMethods = documents.compactMap { document -> PaymentMethod? in
+                    try? document.data(as: PaymentMethod.self)
+                }
+                completion(paymentMethods)
+            }
+        listeners.append(listener)
+    }
+    
+    func saveIncome(_ income: Income) {
+        do {
+            try db.collection("incomes")
+                .document(income.id.uuidString)
+                .setData(from: income)
+        } catch {
+            print("Error saving income: \(error.localizedDescription)")
+        }
+    }
+    
+    func savePaymentMethod(_ paymentMethod: PaymentMethod) {
+        do {
+            try db.collection("paymentMethods")
+                .document(paymentMethod.id.uuidString)
+                .setData(from: paymentMethod)
+        } catch {
+            print("Error saving payment method: \(error.localizedDescription)")
+        }
+    }
+    
+    func deleteIncome(id: UUID) {
+        db.collection("incomes")
+            .document(id.uuidString)
+            .delete()
+    }
+    
+    func deletePaymentMethod(id: UUID) {
+        db.collection("paymentMethods")
+            .document(id.uuidString)
+            .delete()
+    }
 }

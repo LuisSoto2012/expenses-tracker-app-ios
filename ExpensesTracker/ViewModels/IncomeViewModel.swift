@@ -8,54 +8,45 @@ class IncomeViewModel: ObservableObject {
     @Published var showingAddIncome = false
     @Published var showingAddPaymentMethod = false
     
-    private let defaults = UserDefaults.standard
-    private let incomesKey = "savedIncomes"
-    private let paymentMethodsKey = "savedPaymentMethods"
+    private let firebaseService = FirebaseService.shared
     
     init() {
         loadData()
     }
     
     func loadData() {
-        if let data = defaults.data(forKey: incomesKey),
-           let decoded = try? JSONDecoder().decode([Income].self, from: data) {
-            incomes = decoded
+        firebaseService.syncIncomes { [weak self] incomes in
+            self?.incomes = incomes
         }
         
-        if let data = defaults.data(forKey: paymentMethodsKey),
-           let decoded = try? JSONDecoder().decode([PaymentMethod].self, from: data) {
-            paymentMethods = decoded
-        }
-    }
-    
-    private func saveData() {
-        if let encoded = try? JSONEncoder().encode(incomes) {
-            defaults.set(encoded, forKey: incomesKey)
-        }
-        
-        if let encoded = try? JSONEncoder().encode(paymentMethods) {
-            defaults.set(encoded, forKey: paymentMethodsKey)
+        firebaseService.syncPaymentMethods { [weak self] paymentMethods in
+            self?.paymentMethods = paymentMethods
         }
     }
     
     func addIncome(_ income: Income) {
-        incomes.append(income)
-        saveData()
+        firebaseService.saveIncome(income)
     }
     
     func deleteIncome(at indexSet: IndexSet) {
-        incomes.remove(atOffsets: indexSet)
-        saveData()
+        indexSet.forEach { index in
+            let income = incomes[index]
+            firebaseService.deleteIncome(id: income.id)
+        }
     }
     
     func addPaymentMethod(_ paymentMethod: PaymentMethod) {
-        paymentMethods.append(paymentMethod)
-        saveData()
+        firebaseService.savePaymentMethod(paymentMethod)
     }
     
     func deletePaymentMethod(at indexSet: IndexSet) {
-        paymentMethods.remove(atOffsets: indexSet)
-        saveData()
+        indexSet.forEach { index in
+            let paymentMethod = paymentMethods[index]
+            // Eliminar de Firestore
+            firebaseService.deletePaymentMethod(id: paymentMethod.id)
+            // Eliminar de la lista local
+            paymentMethods.remove(at: index)
+        }
     }
     
     func calculateMonthlyIncome() -> Double {
@@ -64,4 +55,4 @@ class IncomeViewModel: ObservableObject {
             return total + (amount * income.frequency.multiplierForMonthly)
         }
     }
-} 
+}

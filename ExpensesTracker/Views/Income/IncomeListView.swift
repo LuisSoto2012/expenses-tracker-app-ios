@@ -5,14 +5,14 @@ struct IncomeListView: View {
     
     var body: some View {
         List {
-            Section(header: Text("Monthly Income: \(viewModel.calculateMonthlyIncome(), specifier: "%.2f")")) {
+            Section(header: Text("Ingresos Mensuales: \(viewModel.calculateMonthlyIncome(), specifier: "%.2f")")) {
                 ForEach(viewModel.incomes) { income in
                     IncomeRowView(income: income)
                 }
                 .onDelete(perform: viewModel.deleteIncome)
             }
         }
-        .navigationTitle("Income Sources")
+        .navigationTitle("Fuentes de Ingresos")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { viewModel.showingAddIncome = true }) {
@@ -39,7 +39,7 @@ struct IncomeRowView: View {
                     .foregroundColor(.secondary)
                 Spacer()
                 if let amount = income.amount {
-                    Text("\(amount, specifier: "%.2f")")
+                    Text("S/. \(amount, specifier: "%.2f")")
                         .font(.subheadline)
                         .foregroundColor(.primary)
                 }
