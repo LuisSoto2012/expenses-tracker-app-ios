@@ -10,6 +10,7 @@ struct AddPaymentMethodView: View {
     @State private var expiryDate = Date()
     @State private var colorHexPrimary = "#007AFF"
     @State private var colorHexSecondary = "#34C759"
+    @State private var gradientDirection: GradientDirection = .topLeftToBottomRight
     @State private var isDefault = false
     
     var body: some View {
@@ -40,9 +41,15 @@ struct AddPaymentMethodView: View {
                         set: { colorHexSecondary = $0.toHex() ?? "#34C759" }
                     ))
                     
+                    Picker("Gradient Direction", selection: $gradientDirection) {
+                        ForEach(GradientDirection.allCases, id: \.self) { direction in
+                            Text(direction.rawValue).tag(direction)
+                        }
+                    }
+                    
                     Toggle("Set as Default", isOn: $isDefault)
                     
-                    // Vista previa del color
+                    // Vista previa del color con dirección seleccionada
                     VStack {
                         Text("Preview")
                             .font(.headline)
@@ -55,8 +62,8 @@ struct AddPaymentMethodView: View {
                                         Color(hex: colorHexPrimary) ?? .blue,
                                         Color(hex: colorHexSecondary) ?? .green
                                     ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
+                                    startPoint: gradientDirection.startPoint,
+                                    endPoint: gradientDirection.endPoint
                                 )
                             )
                             .frame(height: 100)
@@ -75,7 +82,7 @@ struct AddPaymentMethodView: View {
                         savePaymentMethod()
                         dismiss()
                     }
-                    .disabled(name.isEmpty) // Evitar guardar si el nombre está vacío
+                    .disabled(name.isEmpty)
                 }
             }
         }
@@ -87,6 +94,7 @@ struct AddPaymentMethodView: View {
             type: type,
             colorHexPrimary: colorHexPrimary,
             colorHexSecondary: colorHexSecondary,
+            gradientDirection: gradientDirection,
             lastFourDigits: type != .cash ? lastFourDigits : nil,
             expiryDate: type != .cash ? expiryDate : nil,
             isDefault: isDefault
