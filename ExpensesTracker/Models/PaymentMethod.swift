@@ -4,7 +4,8 @@ struct PaymentMethod: Identifiable, Codable {
     var id: UUID
     var name: String
     var type: PaymentMethodType
-    var colorHex: String
+    var colorHexPrimary: String
+    var colorHexSecondary: String
     var lastFourDigits: String?
     var expiryDate: Date?
     var isDefault: Bool
@@ -12,21 +13,27 @@ struct PaymentMethod: Identifiable, Codable {
     init(id: UUID = UUID(),
          name: String,
          type: PaymentMethodType,
-         colorHex: String = "#007AFF",
+         colorHexPrimary: String = "#007AFF",
+         colorHexSecondary: String = "#34C759",
          lastFourDigits: String? = nil,
          expiryDate: Date? = nil,
          isDefault: Bool = false) {
         self.id = id
         self.name = name
         self.type = type
-        self.colorHex = colorHex
+        self.colorHexPrimary = colorHexPrimary
+        self.colorHexSecondary = colorHexSecondary
         self.lastFourDigits = lastFourDigits
         self.expiryDate = expiryDate
         self.isDefault = isDefault
     }
     
-    var color: Color {
-        Color(hex: colorHex) ?? .blue
+    var colorPrimary: Color {
+        Color(hex: colorHexPrimary) ?? .blue
+    }
+    
+    var colorSecondary: Color {
+        Color(hex: colorHexSecondary) ?? .green
     }
 }
 

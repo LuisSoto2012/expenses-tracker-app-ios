@@ -8,7 +8,8 @@ struct AddPaymentMethodView: View {
     @State private var type: PaymentMethodType = .debitCard
     @State private var lastFourDigits = ""
     @State private var expiryDate = Date()
-    @State private var colorHex = "#007AFF"
+    @State private var colorHexPrimary = "#007AFF"
+    @State private var colorHexSecondary = "#34C759"
     @State private var isDefault = false
     
     var body: some View {
@@ -28,12 +29,40 @@ struct AddPaymentMethodView: View {
                     }
                 }
                 
-                Section {
-                    ColorPicker("Card Color", selection: Binding(
-                        get: { Color(hex: colorHex) ?? .blue },
-                        set: { colorHex = $0.toHex() ?? "#007AFF" }
+                Section("Card Appearance") {
+                    ColorPicker("Primary Color", selection: Binding(
+                        get: { Color(hex: colorHexPrimary) ?? .blue },
+                        set: { colorHexPrimary = $0.toHex() ?? "#007AFF" }
                     ))
+                    
+                    ColorPicker("Secondary Color", selection: Binding(
+                        get: { Color(hex: colorHexSecondary) ?? .green },
+                        set: { colorHexSecondary = $0.toHex() ?? "#34C759" }
+                    ))
+                    
                     Toggle("Set as Default", isOn: $isDefault)
+                    
+                    // Vista previa del color
+                    VStack {
+                        Text("Preview")
+                            .font(.headline)
+                            .padding(.top)
+                        
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(hex: colorHexPrimary) ?? .blue,
+                                        Color(hex: colorHexSecondary) ?? .green
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(height: 100)
+                            .shadow(radius: 5)
+                            .padding(.horizontal)
+                    }
                 }
             }
             .navigationTitle("Add Payment Method")
@@ -46,7 +75,7 @@ struct AddPaymentMethodView: View {
                         savePaymentMethod()
                         dismiss()
                     }
-                    .disabled(name.isEmpty)
+                    .disabled(name.isEmpty) // Evitar guardar si el nombre está vacío
                 }
             }
         }
@@ -56,11 +85,12 @@ struct AddPaymentMethodView: View {
         let method = PaymentMethod(
             name: name,
             type: type,
-            colorHex: colorHex,
+            colorHexPrimary: colorHexPrimary,
+            colorHexSecondary: colorHexSecondary,
             lastFourDigits: type != .cash ? lastFourDigits : nil,
             expiryDate: type != .cash ? expiryDate : nil,
             isDefault: isDefault
         )
         viewModel.addPaymentMethod(method)
     }
-} 
+}

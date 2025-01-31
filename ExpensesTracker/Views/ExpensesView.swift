@@ -135,7 +135,7 @@ struct ExpensesView: View {
             )
         }
         .sheet(isPresented: $showingAddExpense) {
-            AddExpenseView()
+            AddExpenseView(isRecurring: selectedOption == .recurring)
         }
     }
     

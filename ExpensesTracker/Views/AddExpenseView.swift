@@ -10,11 +10,15 @@ struct AddExpenseView: View {
     @State private var notes: String = ""
     @State private var date = Date()
     @State private var selectedCategoryId: UUID?
-    @State private var isRecurring = false
     @State private var recurrenceInterval: RecurrenceInterval = .monthly
     @State private var isFixed = false
     @State private var endDate = Date()
     @State private var selectedPaymentMethod: PaymentMethod?
+    @State private var isRecurring: Bool
+    
+    init(isRecurring: Bool) {
+        _isRecurring = State(initialValue: isRecurring)
+    }
     
     var body: some View {
         NavigationView {
@@ -61,29 +65,31 @@ struct AddExpenseView: View {
                     Text("Detalles")
                 }
                 
-                Section("Payment Method") {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(spacing: 15) {
-                            ForEach(incomeViewModel.paymentMethods) { method in
-                                PaymentMethodCard(paymentMethod: method)
-                                    .frame(width: 250, height: 150)
-                                    .onTapGesture {
-                                        selectedPaymentMethod = method
-                                    }
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 15)
-                                            .stroke(selectedPaymentMethod?.id == method.id ? Color.white : Color.clear, lineWidth: 3)
-                                    )
+                if !incomeViewModel.paymentMethods.isEmpty {
+                    Section("Método de Pago") {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: 15) {
+                                ForEach(incomeViewModel.paymentMethods) { method in
+                                    PaymentMethodCard(paymentMethod: method)
+                                        .frame(width: 250, height: 150)
+                                        .onTapGesture {
+                                            selectedPaymentMethod = method
+                                        }
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .stroke(selectedPaymentMethod?.id == method.id ? Color.white : Color.clear, lineWidth: 3)
+                                        )
+                                }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
+                        .frame(height: 170)
                     }
-                    .frame(height: 170)
                 }
                 
                 // Recurring Expense Section
                 Section {
-                    Toggle("Gasto Recurrente", isOn: $isRecurring)
+                    Toggle("Es Recurrente", isOn: $isRecurring)
                     
                     if isRecurring {
                         Picker("Intervalo", selection: $recurrenceInterval) {

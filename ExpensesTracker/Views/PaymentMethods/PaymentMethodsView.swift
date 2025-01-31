@@ -85,7 +85,16 @@ struct PaymentMethodCard: View {
         }
         .padding()
         .frame(width: 300, height: 180)
-        .background(paymentMethod.color)
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    paymentMethod.colorPrimary,
+                    paymentMethod.colorSecondary
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
         .foregroundColor(.white)
         .cornerRadius(15)
         .shadow(radius: 5)
