@@ -21,6 +21,7 @@ class IncomeViewModel: ObservableObject {
         
         firebaseService.syncPaymentMethods { [weak self] paymentMethods in
             self?.paymentMethods = paymentMethods
+            print("Métodos de pago sincronizados: \(paymentMethods)")
         }
     }
     

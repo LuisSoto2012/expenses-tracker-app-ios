@@ -221,4 +221,87 @@ class FirebaseService: ObservableObject {
             .document(id.uuidString)
             .delete()
     }
+    
+    // MARK: - Account Management
+
+    // Sincronizar cuentas desde Firebase
+    func syncAccounts(completion: @escaping ([Account]) -> Void) {
+        let listener = db.collection("accounts")
+            .addSnapshotListener { snapshot, error in
+                guard let documents = snapshot?.documents else {
+                    print("Error fetching accounts: \(error?.localizedDescription ?? "Unknown error")")
+                    return
+                }
+
+                let accounts = documents.compactMap { document -> Account? in
+                    try? document.data(as: Account.self)
+                }
+                completion(accounts)
+            }
+        listeners.append(listener)
+    }
+
+    // Guardar una cuenta en Firebase (agregar o actualizar)
+    func saveAccount(_ account: Account) {
+        do {
+            try db.collection("accounts")
+                .document(account.id.uuidString)
+                .setData(from: account)
+        } catch {
+            print("Error saving account: \(error.localizedDescription)")
+        }
+    }
+
+    // Eliminar una cuenta en Firebase
+    func deleteAccount(id: UUID) {
+        db.collection("accounts")
+            .document(id.uuidString)
+            .delete { error in
+                if let error = error {
+                    print("Error deleting account: \(error.localizedDescription)")
+                }
+            }
+    }
+
+    // Actualizar una cuenta en Firebase (similar a save, pero es una actualización explícita)
+    func updateAccount(_ account: Account) {
+        do {
+            try db.collection("accounts")
+                .document(account.id.uuidString)
+                .setData(from: account)
+        } catch {
+            print("Error updating account: \(error.localizedDescription)")
+        }
+    }
+    
+    func deleteAllCollectionsExceptCategories() {
+        // Eliminar documentos de todas las colecciones excepto "categories"
+        let collectionsToDelete = ["expenses", "budgets", "debts", "incomes", "paymentMethods", "accounts"]
+        
+        // Iterar sobre las colecciones a eliminar
+        for collectionName in collectionsToDelete {
+            db.collection(collectionName).getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching documents from \(collectionName): \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let documents = snapshot?.documents else {
+                    print("No documents found in \(collectionName).")
+                    return
+                }
+                
+                // Eliminar cada documento de la colección
+                for document in documents {
+                    document.reference.delete { error in
+                        if let error = error {
+                            print("Error deleting document \(document.documentID) from \(collectionName): \(error.localizedDescription)")
+                        } else {
+                            print("Document \(document.documentID) deleted from \(collectionName).")
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -8,10 +8,20 @@ struct SettingsView: View {
     @State private var showingCategorySheet = false
     @State private var showingExportSheet = false
     @State private var showingSignOutAlert = false
+    @State private var showingDeleteConfirmation = false
+    
+    @StateObject private var firebaseService = FirebaseService.shared
     
     var body: some View {
         NavigationView {
             List {
+                // Accounts Section
+                Section("Cuentas") {
+                    NavigationLink(destination: AccountManagementView()) {
+                        Label("Gestionar Cuentas", systemImage: "banknote")
+                    }
+                }
+                
                 // Incomes section
                 Section("Income & Payments") {
                     NavigationLink(destination: IncomeListView(viewModel: incomeViewModel)) {
@@ -84,6 +94,25 @@ struct SettingsView: View {
                             .foregroundColor(.secondary)
                     }
                 }
+                
+                // Sección de "Eliminar Todo"
+                Section {
+                    Button(action: {
+                        showingDeleteConfirmation = true  // Mostrar la confirmación
+                    }) {
+                        Label("Eliminar Todo", systemImage: "trash")
+                            .foregroundColor(.red)
+                    }
+                }
+                .alert("Eliminar Todo", isPresented: $showingDeleteConfirmation) {
+                    Button("Cancelar", role: .cancel) { }
+                    Button("Eliminar", role: .destructive) {
+                        // Aquí llamamos a la función que elimina todos los datos
+                        deleteAllData()
+                    }
+                } message: {
+                    Text("¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.")
+                }
             }
             .navigationTitle("Configuración")
         }
@@ -99,6 +128,11 @@ struct SettingsView: View {
         } message: {
             Text("¿Estás seguro de que deseas cerrar sesión?")
         }
+    }
+    
+    private func deleteAllData() {
+        // Llamamos a FirebaseService para eliminar las colecciones
+        firebaseService.deleteAllCollectionsExceptCategories()
     }
 }
 

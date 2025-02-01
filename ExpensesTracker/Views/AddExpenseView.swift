@@ -70,7 +70,9 @@ struct AddExpenseView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: 15) {
                                 ForEach(incomeViewModel.paymentMethods) { method in
-                                    PaymentMethodCard(paymentMethod: method)
+                                    PaymentMethodCard(
+                                        paymentMethod: method,
+                                        isSelected: .constant(false))
                                         .frame(width: 250, height: 150)
                                         .onTapGesture {
                                             selectedPaymentMethod = method

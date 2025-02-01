@@ -24,7 +24,9 @@ struct PaymentMethodsView: View {
                             Spacer() // Agregar un Spacer antes de las tarjetas para centrar
                             LazyHStack(spacing: 20) {
                                 ForEach(viewModel.paymentMethods) { method in
-                                    PaymentMethodCard(paymentMethod: method)
+                                    PaymentMethodCard(
+                                        paymentMethod: method,
+                                        isSelected: .constant(false))
                                         .contextMenu {
                                             Button(role: .destructive) {
                                                 deletePaymentMethod(method)
@@ -42,7 +44,9 @@ struct PaymentMethodsView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVStack(spacing: 20) {
                             ForEach(viewModel.paymentMethods) { method in
-                                PaymentMethodCard(paymentMethod: method)
+                                PaymentMethodCard(
+                                    paymentMethod: method,
+                                    isSelected: .constant(false))
                                     .contextMenu {
                                         Button(role: .destructive) {
                                             deletePaymentMethod(method)
@@ -92,13 +96,20 @@ struct PaymentMethodsView: View {
 
 struct PaymentMethodCard: View {
     let paymentMethod: PaymentMethod
-    @State private var isSelected = false // Estado de selección
+    @Binding var isSelected: Bool // Estado de selección
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Image(systemName: paymentMethod.type.icon)
                 Spacer()
+                
+                // Checkmark para indicar si la tarjeta está seleccionada
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.white)
+                }
+                
                 if paymentMethod.isDefault {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.white)
@@ -164,8 +175,5 @@ struct PaymentMethodCard: View {
                 .opacity(isSelected ? 1 : 0)
                 .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isSelected)
         )
-        .onTapGesture {
-            isSelected.toggle()
-        }
     }
 }
