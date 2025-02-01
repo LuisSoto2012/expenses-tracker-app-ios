@@ -72,20 +72,31 @@ struct AddExpenseView: View {
                                 ForEach(incomeViewModel.paymentMethods) { method in
                                     PaymentMethodCard(
                                         paymentMethod: method,
-                                        isSelected: .constant(false))
+                                        isSelected: .init(
+                                            get: {
+                                                // Verifica si el método de pago actual es el seleccionado
+                                                selectedPaymentMethod?.id == method.id
+                                            },
+                                            set: { _ in }
+                                        ))
                                         .frame(width: 250, height: 150)
                                         .onTapGesture {
                                             selectedPaymentMethod = method
                                         }
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 15)
-                                                .stroke(selectedPaymentMethod?.id == method.id ? Color.white : Color.clear, lineWidth: 3)
-                                        )
+//                                        .overlay(
+//                                            RoundedRectangle(cornerRadius: 15)
+//                                                .stroke(
+//                                                    selectedPaymentMethod?.id == method.id ? Color.blue.opacity(0.7) : Color.clear,
+//                                                    lineWidth: selectedPaymentMethod?.id == method.id ? 4 : 0
+//                                                )
+//                                                .shadow(color: selectedPaymentMethod?.id == method.id ? Color.blue : Color.clear, radius: 10, x: 0, y: 0)
+//                                                .animation(.easeInOut(duration: 0.3), value: selectedPaymentMethod?.id)
+//                                        )
                                 }
                             }
-                            .padding(.horizontal)
+                            .padding(.horizontal, 30)
                         }
-                        .frame(height: 170)
+                        .frame(height: 190)
                     }
                 }
                 

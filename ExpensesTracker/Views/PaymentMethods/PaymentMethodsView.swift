@@ -144,6 +144,13 @@ struct PaymentMethodCard: View {
                     endPoint: paymentMethod.gradientEnd
                 )
                 
+                // Efecto de iluminación interna al seleccionarla
+                if isSelected {
+                    Color.white.opacity(0.2)
+                        .blur(radius: 10)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                }
+ 
                 // Efecto de brillo / reflejo
                 LinearGradient(
                     gradient: Gradient(colors: [
@@ -158,22 +165,31 @@ struct PaymentMethodCard: View {
         )
         .foregroundColor(.white)
         .cornerRadius(15)
-        .shadow(radius: 5)
+        .shadow(color: isSelected ? Color.blue.opacity(0.6) : Color.black.opacity(0.2), radius: isSelected ? 10 : 5, x: 0, y: 5)
         .overlay(
-            // Efecto de borde brillante animado
-            RoundedRectangle(cornerRadius: 15)
-                .stroke(
-                    LinearGradient(
-                        gradient: Gradient(colors: isSelected ?
-                            [Color.white, Color.blue, Color.white] :
-                            [Color.clear, Color.clear]),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ),
-                    lineWidth: isSelected ? 3 : 0
-                )
-                .opacity(isSelected ? 1 : 0)
-                .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isSelected)
+            ZStack {
+                // Borde animado brillante
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke(
+                        LinearGradient(
+                            gradient: Gradient(colors: isSelected ?
+                                [Color.white, Color.blue, Color.white] :
+                                [Color.clear, Color.clear]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        lineWidth: isSelected ? 4 : 0
+                    )
+                    .opacity(isSelected ? 1 : 0)
+                    .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isSelected)
+
+                // Resplandor alrededor de la tarjeta al seleccionarla
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color.blue.opacity(0.5), lineWidth: 6)
+                        .blur(radius: 10)
+                }
+            }
         )
     }
 }
