@@ -305,6 +305,31 @@ class FirebaseService: ObservableObject {
         }
     }
     
+    func deleteCollection(collectionName: String) {
+        db.collection(collectionName).getDocuments { snapshot, error in
+            if let error = error {
+                print("Error fetching documents from \(collectionName): \(error.localizedDescription)")
+                return
+            }
+            
+            guard let documents = snapshot?.documents else {
+                print("No documents found in \(collectionName).")
+                return
+            }
+            
+            // Eliminar cada documento de la colección
+            for document in documents {
+                document.reference.delete { error in
+                    if let error = error {
+                        print("Error deleting document \(document.documentID) from \(collectionName): \(error.localizedDescription)")
+                    } else {
+                        print("Document \(document.documentID) deleted from \(collectionName).")
+                    }
+                }
+            }
+        }
+    }
+    
     // Transactions
     
     // Guardar una transacción en Firebase
