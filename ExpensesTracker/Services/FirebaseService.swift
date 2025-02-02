@@ -304,4 +304,35 @@ class FirebaseService: ObservableObject {
             }
         }
     }
+    
+    // Transactions
+    
+    // Guardar una transacción en Firebase
+    func saveTransaction(_ transaction: Transaction) {
+        do {
+            try db.collection("transactions")
+                .document(transaction.id.uuidString)
+                .setData(from: transaction)
+        } catch {
+            print("Error saving transaction: \(error.localizedDescription)")
+        }
+    }
+
+    // Obtener todas las transacciones de una cuenta
+    func fetchTransactions(for accountId: UUID, completion: @escaping ([Transaction]) -> Void) {
+        db.collection("transactions")
+            .whereField("accountId", isEqualTo: accountId.uuidString)
+            .getDocuments { snapshot, error in
+                guard let documents = snapshot?.documents else {
+                    print("Error fetching transactions: \(error?.localizedDescription ?? "Unknown error")")
+                    completion([])
+                    return
+                }
+                
+                let transactions = documents.compactMap { document -> Transaction? in
+                    try? document.data(as: Transaction.self)
+                }
+                completion(transactions)
+            }
+    }
 }

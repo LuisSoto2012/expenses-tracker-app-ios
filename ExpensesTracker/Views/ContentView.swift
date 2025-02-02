@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject var expenseViewModel: ExpenseViewModel
     @StateObject var incomeViewModel: IncomeViewModel
+    @StateObject var accountViewModel: AccountViewModel
     @State private var showingBudgetAlert = false
     @State private var budgetAlertCategory: Category?
     
@@ -17,6 +18,7 @@ struct ContentView: View {
         TabView {
             HomeView()
                 .environmentObject(expenseViewModel)
+                .environmentObject(accountViewModel)
                 .tabItem {
                     Label("Inicio", systemImage: "house.fill") // Translated text
                 }
@@ -24,6 +26,7 @@ struct ContentView: View {
             ExpensesView()
                 .environmentObject(expenseViewModel)
                 .environmentObject(incomeViewModel)
+                .environmentObject(accountViewModel)
                 .tabItem {
                     Label("Gastos", systemImage: "dollarsign.circle.fill") // Translated text
                 }

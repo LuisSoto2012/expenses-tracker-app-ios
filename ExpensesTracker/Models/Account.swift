@@ -10,6 +10,7 @@ import Foundation
 struct Account: Identifiable, Codable {
    var id: UUID
    var name: String
+   var initialBalance: Double
    var balance: Double
    var currency: String
    var paymentMethods: [UUID]  // Relación con PaymentMethods (si tienes varios medios de pago vinculados)
@@ -23,6 +24,7 @@ struct Account: Identifiable, Codable {
          isDefault: Bool) {
         self.id = id
         self.name = name
+        self.initialBalance = balance
         self.balance = balance
         self.currency = currency
         self.paymentMethods = paymentMethods

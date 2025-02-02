@@ -4,6 +4,7 @@ struct AddExpenseView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var expenseViewModel: ExpenseViewModel
     @EnvironmentObject private var incomeViewModel: IncomeViewModel
+    @EnvironmentObject private var accountViewModel: AccountViewModel
     
     @State private var name: String = ""
     @State private var amount: Double = 0.0
@@ -138,7 +139,7 @@ struct AddExpenseView: View {
     }
     
     private var isFormValid: Bool {
-        return amount > 0 && selectedCategoryId != nil
+        return amount > 0 && selectedCategoryId != nil && selectedPaymentMethod != nil
     }
     
     private func saveExpense() {
@@ -163,6 +164,10 @@ struct AddExpenseView: View {
         } else {
             expenseViewModel.addExpense(expense)
         }
+        
+        // Registrar la transacción en la cuenta
+        accountViewModel.registerExpense(expense)
+        
         dismiss()
     }
 }
