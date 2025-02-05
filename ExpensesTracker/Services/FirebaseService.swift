@@ -57,6 +57,22 @@ class FirebaseService: ObservableObject {
         listeners.append(listener)
     }
     
+    func syncTransactions(completion: @escaping ([Transaction]) -> Void) {
+        let listener = db.collection("transactions")
+            .addSnapshotListener { snapshot, error in
+                guard let documents = snapshot?.documents else {
+                    print("Error fetching transactions: \(error?.localizedDescription ?? "Unknown error")")
+                    return
+                }
+                
+                let transactions = documents.compactMap { document -> Transaction? in
+                    try? document.data(as: Transaction.self)
+                }
+                completion(transactions)
+            }
+        listeners.append(listener)
+    }
+    
     func saveExpense(_ expense: Expense) {
         do {
             try db.collection("expenses")
@@ -225,20 +241,19 @@ class FirebaseService: ObservableObject {
     // MARK: - Account Management
 
     // Sincronizar cuentas desde Firebase
-    func syncAccounts(completion: @escaping ([Account]) -> Void) {
-        let listener = db.collection("accounts")
+    func syncAccounts(completion: @escaping ([Account]) -> Void) {       
+        db.collection("accounts")
             .addSnapshotListener { snapshot, error in
                 guard let documents = snapshot?.documents else {
                     print("Error fetching accounts: \(error?.localizedDescription ?? "Unknown error")")
                     return
                 }
-
+                
                 let accounts = documents.compactMap { document -> Account? in
                     try? document.data(as: Account.self)
                 }
                 completion(accounts)
             }
-        listeners.append(listener)
     }
 
     // Guardar una cuenta en Firebase (agregar o actualizar)
@@ -256,22 +271,12 @@ class FirebaseService: ObservableObject {
     func deleteAccount(id: UUID) {
         db.collection("accounts")
             .document(id.uuidString)
-            .delete { error in
-                if let error = error {
-                    print("Error deleting account: \(error.localizedDescription)")
-                }
-            }
+            .delete()
     }
 
     // Actualizar una cuenta en Firebase (similar a save, pero es una actualización explícita)
     func updateAccount(_ account: Account) {
-        do {
-            try db.collection("accounts")
-                .document(account.id.uuidString)
-                .setData(from: account)
-        } catch {
-            print("Error updating account: \(error.localizedDescription)")
-        }
+        saveAccount(account)
     }
     
     func deleteAllCollectionsExceptCategories() {
@@ -334,8 +339,10 @@ class FirebaseService: ObservableObject {
     
     // Guardar una transacción en Firebase
     func saveTransaction(_ transaction: Transaction) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
         do {
-            try db.collection("transactions")
+            try db.collection("users").document(userId).collection("transactions")
                 .document(transaction.id.uuidString)
                 .setData(from: transaction)
         } catch {

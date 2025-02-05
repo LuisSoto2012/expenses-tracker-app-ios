@@ -11,8 +11,10 @@ class ExpenseViewModel: ObservableObject {
     @Published var needsRefresh: Bool = false
     
     private let firebaseService = FirebaseService()
+    private let accountViewModel: AccountViewModel
     
-    init() {
+    init(accountViewModel: AccountViewModel) {
+        self.accountViewModel = accountViewModel
         setupDataSync()
     }
     
@@ -47,7 +49,11 @@ class ExpenseViewModel: ObservableObject {
     // MARK: - Expense Methods
     
     func addExpense(_ expense: Expense) {
+        // Save the expense
         firebaseService.saveExpense(expense)
+        
+        // Create a transaction for the expense
+        accountViewModel.registerExpense(expense)
     }
     
     func addRecurringExpense(_ expense: Expense, endDate: Date) {

@@ -26,7 +26,7 @@ struct AccountFormView: View {
        if case .edit(let account) = mode {
            // Inicializar las propiedades del account
            _name = State(initialValue: account.name)
-           _balance = State(initialValue: account.balance)
+           _balance = State(initialValue: account.currentBalance)
            _currency = State(initialValue: account.currency)
            _isDefault = State(initialValue: account.isDefault)
            

@@ -8,13 +8,22 @@
 import Foundation
 
 struct Account: Identifiable, Codable {
-   var id: UUID
-   var name: String
-   var initialBalance: Double
-   var balance: Double
-   var currency: String
-   var paymentMethods: [UUID]  // Relación con PaymentMethods (si tienes varios medios de pago vinculados)
-   var isDefault: Bool
+    var id: UUID
+    let name: String
+    let type: AccountType
+    let initialBalance: Double
+    var currentBalance: Double
+    let currency: String
+    let color: String  // For UI customization
+    var paymentMethods: [UUID]  // Relación con PaymentMethods (si tienes varios medios de pago vinculados)
+    var isDefault: Bool
+    
+    enum AccountType: String, Codable {
+        case checking
+        case savings
+        case credit
+        case cash
+    }
     
     init(id: UUID = UUID(),
          name: String,
@@ -25,9 +34,26 @@ struct Account: Identifiable, Codable {
         self.id = id
         self.name = name
         self.initialBalance = balance
-        self.balance = balance
+        self.currentBalance = balance
         self.currency = currency
         self.paymentMethods = paymentMethods
         self.isDefault = isDefault
+        self.type = .checking
+        self.color = ""
+    }
+}
+
+extension Account.AccountType {
+    var icon: String {
+        switch self {
+        case .checking:
+            return "creditcard"
+        case .savings:
+            return "banknote"
+        case .credit:
+            return "creditcard.fill"
+        case .cash:
+            return "dollarsign.circle"
+        }
     }
 }

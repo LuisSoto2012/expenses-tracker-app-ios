@@ -11,18 +11,33 @@ import FirebaseCore
 @main
 struct ExpensesTrackerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject private var expenseViewModel = ExpenseViewModel()
-    @StateObject private var incomeViewModel = IncomeViewModel()
-    @StateObject private var accountViewModel = AccountViewModel()
+    
+    // Wrap ViewModels in StateObjects
+    @StateObject private var accountViewModel: AccountViewModel
+    @StateObject private var expenseViewModel: ExpenseViewModel
+    @StateObject private var incomeViewModel: IncomeViewModel
     
     init() {
+        // Configure Firebase
         FirebaseApp.configure()
+        
+        // Initialize ViewModels using factory
+        let factory = ViewModelFactory.shared
+        _accountViewModel = StateObject(wrappedValue: factory.accountViewModel)
+        _expenseViewModel = StateObject(wrappedValue: factory.expenseViewModel)
+        _incomeViewModel = StateObject(wrappedValue: factory.incomeViewModel)
     }
     
     var body: some Scene {
         WindowGroup {
-            ContentView(expenseViewModel: expenseViewModel, incomeViewModel: incomeViewModel, accountViewModel: accountViewModel)
-                .environmentObject(expenseViewModel)
+            ContentView(
+                expenseViewModel: expenseViewModel,
+                incomeViewModel: incomeViewModel,
+                accountViewModel: accountViewModel
+            )
+            .environmentObject(expenseViewModel)
+            .environmentObject(accountViewModel)
+            .environmentObject(incomeViewModel)
         }
     }
 }
