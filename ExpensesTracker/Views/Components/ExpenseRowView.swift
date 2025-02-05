@@ -80,7 +80,6 @@ struct ExpenseRowView: View {
             // Mostrar botón "Pagar" solo si el gasto es recurrente y no está pagado
             if expense.isRecurring, !(expense.isPaid ?? false) {
                 if isLoadingPayment {
-                    // Mostrar indicador de carga
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
                         .frame(width: 44, height: 44)
@@ -88,12 +87,10 @@ struct ExpenseRowView: View {
                     Button(action: {
                         withAnimation {
                             isLoadingPayment = true
-                        }
-                        // Simular una llamada de red o pago
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                            withAnimation {
-                                isLoadingPayment = false
+                            // Marcar como pagado después de un breve retraso
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                                 expenseViewModel.markAsPaid(expenseId: expense.id)
+                                isLoadingPayment = false
                             }
                         }
                     }) {
@@ -206,15 +203,3 @@ struct ExpenseRowView: View {
         }
     }
 }
-
-#Preview {
-    ExpenseRowView(expense: Expense(
-        name: "Compra de supermercado",
-        amount: 42.50,
-        notes: "Compra de supermercado",
-        categoryId: Category.defaults[0].id,
-        isRecurring: true,
-        recurrenceInterval: .monthly
-    ))
-    .environmentObject(ExpenseViewModel())
-} 
