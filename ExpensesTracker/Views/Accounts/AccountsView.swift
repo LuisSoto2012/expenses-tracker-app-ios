@@ -5,53 +5,70 @@ struct AccountManagementView: View {
     @EnvironmentObject private var incomeViewModel: IncomeViewModel
     @State private var showingAddAccount = false
     @State private var showingSyncConfirmation = false
-    @State private var selectedTab = 0
+    @State private var selectedAccount: Account?
     
     var body: some View {
         NavigationView {
-            List {
-                Section {
-                    ForEach(accountViewModel.accounts) { account in
-                        NavigationLink {
-                            TransactionsView(account: account)
-                                .environmentObject(accountViewModel)
-                        } label: {
-                            AccountRowView(account: account)
-                        }
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Total Balance Card
+                    VStack(spacing: 8) {
+                        Text("Balance Total")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                        
+                        Text(totalBalance, format: .currency(code: "PEN"))
+                            .font(.system(size: 34, weight: .bold))
+                            .foregroundColor(totalBalanceColor)
                     }
-                } header: {
-                    Text("Cuentas")
-                }
-                
-                Section {
-                    Button(action: {
-                        showingSyncConfirmation = true
-                    }) {
-                        HStack {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                            Text("Sincronizar Transacciones")
-                        }
-                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(12)
+                    .shadow(radius: 2)
+                    .padding(.horizontal)
                     
+                    // Accounts List
+                    LazyVStack(spacing: 12) {
+                        ForEach(accountViewModel.accounts) { account in
+                            AccountCard(account: account)
+                                .onTapGesture {
+                                    selectedAccount = account
+                                }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                .padding(.vertical)
+            }
+            .navigationTitle("Cuentas")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         showingAddAccount = true
                     }) {
-                        Label("Agregar Cuenta", systemImage: "plus.circle.fill")
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title3)
                     }
-                    
-                    NavigationLink {
-                        PaymentMethodsView(viewModel: incomeViewModel)
-                    } label: {
-                        Label("Métodos de Pago", systemImage: "creditcard")
+                }
+                
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        showingSyncConfirmation = true
+                    }) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
                     }
-                } header: {
-                    Text("Acciones")
                 }
             }
-            .navigationTitle("Cuentas")
             .sheet(isPresented: $showingAddAccount) {
                 AccountFormView(mode: .add, incomeViewModel: incomeViewModel)
                     .environmentObject(accountViewModel)
+            }
+            .sheet(item: $selectedAccount) { account in
+                NavigationView {
+                    AccountFormView(mode: .edit(account), incomeViewModel: incomeViewModel)
+                        .environmentObject(accountViewModel)
+                }
             }
             .alert("Sincronizar Transacciones", isPresented: $showingSyncConfirmation) {
                 Button("Cancelar", role: .cancel) { }
@@ -63,25 +80,45 @@ struct AccountManagementView: View {
             }
         }
     }
+    
+    private var totalBalance: Double {
+        accountViewModel.accounts.reduce(0) { $0 + $1.currentBalance }
+    }
+    
+    private var totalBalanceColor: Color {
+        totalBalance >= 0 ? .primary : .red
+    }
 }
 
-// MARK: - Account Row View
-struct AccountRowView: View {
+// MARK: - Account Card View
+struct AccountCard: View {
     let account: Account
     
     var body: some View {
-        HStack {
+        HStack(spacing: 16) {
+            // Icon Circle
             Circle()
                 .fill(Color(account.color))
-                .frame(width: 40, height: 40)
+                .frame(width: 50, height: 50)
                 .overlay(
                     Image(systemName: account.type.icon)
                         .foregroundColor(.white)
+                        .font(.title3)
                 )
             
-            VStack(alignment: .leading) {
-                Text(account.name)
-                    .font(.headline)
+            // Account Info
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(account.name)
+                        .font(.headline)
+                    
+                    if account.isDefault {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.accentColor)
+                            .font(.caption)
+                    }
+                }
+                
                 Text(account.type.rawValue.capitalized)
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -89,16 +126,16 @@ struct AccountRowView: View {
             
             Spacer()
             
-            VStack(alignment: .trailing) {
-                Text("\(account.currency) \(account.currentBalance, specifier: "%.2f")")
+            // Balance
+            VStack(alignment: .trailing, spacing: 4) {
+                Text(account.currentBalance, format: .currency(code: account.currency))
                     .font(.headline)
                     .foregroundColor(account.currentBalance >= 0 ? .primary : .red)
             }
-            
-            if account.isDefault {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.accentColor)
-            }
         }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(radius: 2)
     }
 }

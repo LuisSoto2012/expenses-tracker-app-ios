@@ -14,15 +14,15 @@ struct HomeView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     // Account Balances
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
-                            ForEach(accountViewModel.accounts) { account in
-                                AccountBalanceCard(account: account)
-                                    .frame(width: 300)
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
+//                    ScrollView(.horizontal, showsIndicators: false) {
+//                        HStack(spacing: 12) {
+//                            ForEach(accountViewModel.accounts) { account in
+//                                AccountBalanceCard(account: account)
+//                                    .frame(width: 300)
+//                            }
+//                        }
+//                        .padding(.horizontal)
+//                    }
                     
                     // Información de la cuenta predeterminada
                     if let account = defaultAccount {

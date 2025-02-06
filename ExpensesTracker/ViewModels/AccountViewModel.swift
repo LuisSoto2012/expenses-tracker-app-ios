@@ -23,15 +23,20 @@ class AccountViewModel: ObservableObject {
     private func setupDataSync() {
         isLoading = true
         
-        // Sincronizar cuentas
+        // Sincronizar cuentas con listener
         firebaseService.syncAccounts { [weak self] accounts in
-            self?.accounts = accounts
-            self?.isLoading = false
+            DispatchQueue.main.async {
+                self?.accounts = accounts
+                self?.isLoading = false
+            }
         }
         
+        // Sincronizar transacciones con listener
         firebaseService.syncTransactions { [weak self] transactions in
-            self?.transactions = transactions
-            self?.updateAccountBalances()
+            DispatchQueue.main.async {
+                self?.transactions = transactions
+                self?.updateAccountBalances()
+            }
         }
     }
     
@@ -39,6 +44,11 @@ class AccountViewModel: ObservableObject {
     
     func addAccount(_ account: Account) {
         firebaseService.saveAccount(account)
+        // Opcionalmente, actualizar la lista local inmediatamente
+        DispatchQueue.main.async { [weak self] in
+            self?.accounts.append(account)
+            self?.objectWillChange.send()
+        }
     }
     
     func updateAccount(_ account: Account) {
