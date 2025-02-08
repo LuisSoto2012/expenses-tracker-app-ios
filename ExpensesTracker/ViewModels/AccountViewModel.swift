@@ -75,7 +75,13 @@ class AccountViewModel: ObservableObject {
             return
         }
         
+        // Verificar si ya existe una transacción para este gasto
+        if transactions.contains(where: { $0.expenseId == expense.id }) {
+            return  // Si ya existe una transacción para este gasto, no crear otra
+        }
+        
         let transaction = Transaction(
+            id: UUID(),
             expenseId: expense.id,
             accountId: defaultAccount.id,
             amount: expense.amount,
@@ -113,6 +119,12 @@ class AccountViewModel: ObservableObject {
     }
     
     func addTransaction(_ transaction: Transaction) {
+        // Verificar si ya existe una transacción con el mismo expenseId
+        if let expenseId = transaction.expenseId,
+           transactions.contains(where: { $0.expenseId == expenseId }) {
+            return  // Si ya existe, no agregar otra
+        }
+        
         // Guardar la transacción en Firebase
         firebaseService.saveTransaction(transaction)
         
@@ -153,21 +165,24 @@ class AccountViewModel: ObservableObject {
             
             // Create transactions for each expense without a transaction
             for expense in expensesWithoutTransactions {
-                let transaction = Transaction(
-                    id: UUID(),  // Generate a new UUID for the transaction
-                    expenseId: expense.id,
-                    accountId: defaultAccount.id,
-                    amount: expense.amount,
-                    type: expense.isRecurring ? .debt : .expense,
-                    date: expense.date,
-                    description: expense.name,
-                    category: expense.categoryId
-                )
-                self.addTransaction(transaction)  // Save the transaction
+                // Verificar una vez más antes de crear la transacción
+                if !self.transactions.contains(where: { $0.expenseId == expense.id }) {
+                    let transaction = Transaction(
+                        id: UUID(),
+                        expenseId: expense.id,
+                        accountId: defaultAccount.id,
+                        amount: expense.amount,
+                        type: expense.isRecurring ? .debt : .expense,
+                        date: expense.date,
+                        description: expense.name,
+                        category: expense.categoryId
+                    )
+                    self.addTransaction(transaction)
+                }
             }
             
             self.isLoading = false
-            self.updateAccountBalances()  // Update account balances after syncing
+            self.updateAccountBalances()
         }
     }
     

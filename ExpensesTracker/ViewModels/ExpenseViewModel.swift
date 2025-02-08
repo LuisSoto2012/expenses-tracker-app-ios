@@ -52,8 +52,30 @@ class ExpenseViewModel: ObservableObject {
         // Save the expense
         firebaseService.saveExpense(expense)
         
-        // Create a transaction for the expense
-        accountViewModel.registerExpense(expense)
+        // Get the account associated with the payment method
+        if let paymentMethodId = expense.paymentMethodId,
+           let account = accountViewModel.accounts.first(where: { account in
+               account.paymentMethods.contains(paymentMethodId)
+           }) {
+            
+            // Create and save the transaction directly
+            let transaction = Transaction(
+                id: UUID(),
+                expenseId: expense.id,
+                accountId: account.id,
+                amount: expense.amount,
+                type: expense.isRecurring ? .debt : .expense,
+                date: expense.date,
+                description: expense.name,
+                category: expense.categoryId
+            )
+            
+            // Save transaction directly to Firebase
+            firebaseService.saveTransaction(transaction)
+        } else {
+            // If no account found for payment method, use default account
+            accountViewModel.registerExpense(expense)
+        }
     }
     
     func addRecurringExpense(_ expense: Expense, endDate: Date) {

@@ -165,9 +165,6 @@ struct AddExpenseView: View {
             expenseViewModel.addExpense(expense)
         }
         
-        // Registrar la transacción en la cuenta
-        accountViewModel.registerExpense(expense)
-        
         dismiss()
     }
 }

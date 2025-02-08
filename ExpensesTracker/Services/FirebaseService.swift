@@ -337,12 +337,11 @@ class FirebaseService: ObservableObject {
     
     // Transactions
     
-    // Guardar una transacción en Firebase
+    // Guardar una transacción en Firebase sin usar userId
     func saveTransaction(_ transaction: Transaction) {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-        
         do {
-            try db.collection("users").document(userId).collection("transactions")
+            // Usamos una colección general llamada "transactions" para almacenar la transacción
+            try db.collection("transactions")
                 .document(transaction.id.uuidString)
                 .setData(from: transaction)
         } catch {
@@ -350,7 +349,7 @@ class FirebaseService: ObservableObject {
         }
     }
 
-    // Obtener todas las transacciones de una cuenta
+    // Obtener todas las transacciones de la colección general sin usar userId
     func fetchTransactions(for accountId: UUID, completion: @escaping ([Transaction]) -> Void) {
         db.collection("transactions")
             .whereField("accountId", isEqualTo: accountId.uuidString)
