@@ -16,6 +16,7 @@ struct AddExpenseView: View {
     @State private var endDate = Date()
     @State private var selectedPaymentMethod: PaymentMethod?
     @State private var isRecurring: Bool
+    @State private var isAutomaticPayment = false
     
     init(isRecurring: Bool) {
         _isRecurring = State(initialValue: isRecurring)
@@ -112,6 +113,9 @@ struct AddExpenseView: View {
                             Text("Mensual").tag(RecurrenceInterval.monthly)
                             Text("Anual").tag(RecurrenceInterval.yearly)
                         }
+                        
+                        Toggle("Pago Automático", isOn: $isAutomaticPayment)
+                        
                         DatePicker("Fecha Fin", selection: $endDate, displayedComponents: .date)
                         
                         Toggle("Monto Fijo", isOn: $isFixed)
@@ -156,7 +160,8 @@ struct AddExpenseView: View {
             isRecurring: isRecurring,
             recurrenceInterval: isRecurring ? recurrenceInterval : nil,
             isFixed: isRecurring ? isFixed : nil,
-            paymentMethodId: selectedPaymentMethod?.id
+            paymentMethodId: selectedPaymentMethod?.id,
+            isAutomaticPayment: isAutomaticPayment
         )
         
         if isRecurring {

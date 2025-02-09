@@ -16,6 +16,14 @@ class ExpenseViewModel: ObservableObject {
     init(accountViewModel: AccountViewModel) {
         self.accountViewModel = accountViewModel
         setupDataSync()
+        
+        // Configurar timer para revisar pagos automáticos diariamente
+        Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { [weak self] _ in
+            self?.checkAutomaticPayments()
+        }
+        
+        // Revisar pagos automáticos al iniciar
+        checkAutomaticPayments()
     }
     
     private func setupDataSync() {
@@ -83,9 +91,11 @@ class ExpenseViewModel: ObservableObject {
             
         var currentDate = expense.date
         var expenses: [Expense] = []
+        let today = Date()
+        let calendar = Calendar.current
         
         while currentDate <= endDate {
-            let newExpense = Expense(
+            var newExpense = Expense(
                 id: UUID(),
                 name: expense.name,
                 amount: expense.amount,
@@ -94,8 +104,15 @@ class ExpenseViewModel: ObservableObject {
                 categoryId: expense.categoryId,
                 isRecurring: expense.isRecurring,
                 recurrenceInterval: expense.recurrenceInterval,
-                isFixed: expense.isFixed
+                isFixed: expense.isFixed,
+                isAutomaticPayment: expense.isAutomaticPayment
             )
+            
+            // Marcar como pagado si tiene pago automático y la fecha es hoy
+            if expense.isAutomaticPayment && calendar.isDate(currentDate, inSameDayAs: today) {
+                newExpense.isPaid = true
+            }
+            
             expenses.append(newExpense)
             
             // Increment currentDate based on the recurrence interval
@@ -355,5 +372,16 @@ class ExpenseViewModel: ObservableObject {
         
         // Recalcular el total mensual
         calculateTotalMonthlyExpenses()
+    }
+    
+    func checkAutomaticPayments() {
+        let today = Date()
+        let calendar = Calendar.current
+        
+        for expense in expenses where expense.isRecurring && expense.isAutomaticPayment && !(expense.isPaid ?? false) {
+            if calendar.isDate(expense.date, inSameDayAs: today) {
+                markAsPaid(expenseId: expense.id)
+            }
+        }
     }
 }

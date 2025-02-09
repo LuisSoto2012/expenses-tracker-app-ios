@@ -11,6 +11,7 @@ import FirebaseCore
 @main
 struct ExpensesTrackerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @Environment(\.scenePhase) private var scenePhase
     
     // Wrap ViewModels in StateObjects
     @StateObject private var accountViewModel: AccountViewModel
@@ -32,6 +33,9 @@ struct ExpensesTrackerApp: App {
         _accountViewModel = StateObject(wrappedValue: factory.accountViewModel)
         _expenseViewModel = StateObject(wrappedValue: factory.expenseViewModel)
         _incomeViewModel = StateObject(wrappedValue: factory.incomeViewModel)
+        
+        // Configurar el AppDelegate con el ExpenseViewModel
+        appDelegate.configure(with: expenseViewModel)
     }
     
     var body: some Scene {
@@ -44,6 +48,11 @@ struct ExpensesTrackerApp: App {
             .environmentObject(expenseViewModel)
             .environmentObject(accountViewModel)
             .environmentObject(incomeViewModel)
+        }
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active {
+                expenseViewModel.checkAutomaticPayments()
+            }
         }
     }
 }

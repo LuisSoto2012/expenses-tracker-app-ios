@@ -12,6 +12,7 @@ struct Expense: Identifiable, Equatable, Codable {
     var isFixed: Bool?
     var isPaid: Bool?
     var paymentMethodId: UUID?
+    var isAutomaticPayment: Bool = false
     
     init(
         id: UUID = UUID(),
@@ -23,7 +24,8 @@ struct Expense: Identifiable, Equatable, Codable {
         isRecurring: Bool = false,
         recurrenceInterval: RecurrenceInterval? = nil,
         isFixed: Bool? = nil,
-        paymentMethodId: UUID? = nil
+        paymentMethodId: UUID? = nil,
+        isAutomaticPayment: Bool = false
     ) {
         self.id = id
         self.name = name
@@ -35,6 +37,7 @@ struct Expense: Identifiable, Equatable, Codable {
         self.recurrenceInterval = recurrenceInterval
         self.isFixed = isFixed
         self.paymentMethodId = paymentMethodId
+        self.isAutomaticPayment = isAutomaticPayment
     }
     
     static func == (lhs: Expense, rhs: Expense) -> Bool {
