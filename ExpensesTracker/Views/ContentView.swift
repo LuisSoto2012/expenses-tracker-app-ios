@@ -23,7 +23,7 @@ struct ContentView: View {
                     Label("Inicio", systemImage: "house.fill") // Translated text
                 }
             
-            ExpensesView()
+            ExpensesView(accountViewModel: accountViewModel)
                 .environmentObject(expenseViewModel)
                 .environmentObject(incomeViewModel)
                 .environmentObject(accountViewModel)

@@ -6,7 +6,7 @@ enum ExpenseOption {
 }
 
 struct ExpensesView: View {
-    @StateObject private var expenseViewModel = ExpenseViewModel()
+    @StateObject private var expenseViewModel: ExpenseViewModel
     @State private var showingAddExpense = false
     @State private var isMonthMode = true // Alternar entre modo Mes y Día
     @State private var selectedMonth: Int = Calendar.current.component(.month, from: Date())
@@ -16,6 +16,10 @@ struct ExpensesView: View {
     @State private var showingActionSheet = false
     @State private var selectedOption: ExpenseOption = .general
     @State private var refreshToggle = false
+
+    init(accountViewModel: AccountViewModel) {
+        _expenseViewModel = StateObject(wrappedValue: ExpenseViewModel(accountViewModel: accountViewModel))
+    }
 
     private var filteredExpenses: [Expense] {
         if isMonthMode {

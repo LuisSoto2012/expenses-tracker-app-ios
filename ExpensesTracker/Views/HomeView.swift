@@ -12,7 +12,17 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: 16) {
+                    // Account Balances
+//                    ScrollView(.horizontal, showsIndicators: false) {
+//                        HStack(spacing: 12) {
+//                            ForEach(accountViewModel.accounts) { account in
+//                                AccountBalanceCard(account: account)
+//                                    .frame(width: 300)
+//                            }
+//                        }
+//                        .padding(.horizontal)
+//                    }
                     
                     // Información de la cuenta predeterminada
                     if let account = defaultAccount {
@@ -92,10 +102,10 @@ struct AccountSummaryView: View {
                 Text("Saldo: ")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                Text(verbatim: CurrencyFormatter.pen.string(from: NSNumber(value: account.balance)) ?? "S/. 0.00")
+                Text(verbatim: CurrencyFormatter.pen.string(from: NSNumber(value: account.currentBalance)) ?? "S/. 0.00")
                     .font(.title3)
                     .fontWeight(.bold)
-                    .foregroundColor(account.balance >= 0 ? .green : .red)
+                    .foregroundColor(account.currentBalance >= 0 ? .green : .red)
             }
             
             Divider()
@@ -128,5 +138,36 @@ struct BudgetProgressView: View {
                 .tint(progress > 1.0 ? .red : category.uiColor)
         }
         .padding(.vertical, 4)
+    }
+}
+
+struct AccountBalanceCard: View {
+    let account: Account
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Circle()
+                    .fill(Color(account.color))
+                    .frame(width: 32, height: 32)
+                    .overlay(
+                        Image(systemName: account.type.icon)
+                            .foregroundColor(.white)
+                    )
+                
+                Text(account.name)
+                    .font(.headline)
+                
+                Spacer()
+                
+                Text("\(account.currency) \(account.currentBalance, specifier: "%.2f")")
+                    .font(.headline)
+                    .foregroundColor(account.currentBalance >= 0 ? .primary : .red)
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(radius: 2)
     }
 }

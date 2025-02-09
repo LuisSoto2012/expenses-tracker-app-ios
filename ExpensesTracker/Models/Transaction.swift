@@ -7,25 +7,42 @@
 
 import Foundation
 
+enum TransactionType: String, Codable {
+    case expense
+    case income
+    case debt
+}
+
 struct Transaction: Identifiable, Codable {
-    var id: UUID
-    var amount: Double  // Negativo para gastos, positivo para ingresos
+    var id: UUID  // Cambiado a UUID para mantener la consistencia
+    var expenseId: UUID?  // Optional, for linking to existing expenses
+    var accountId: UUID
+    var amount: Double
+    var type: TransactionType
     var date: Date
     var description: String
-    var paymentMethodId: UUID
-    var accountId: UUID
+    var category: UUID?  // Optional, same as in expenses
     
+    var isIncoming: Bool {
+        return type == .income
+    }
+    
+    // Inicializador
     init(id: UUID = UUID(),
+         expenseId: UUID? = nil,
+         accountId: UUID,
          amount: Double,
+         type: TransactionType,
          date: Date,
          description: String,
-         paymentMethodId: UUID,
-         accountId: UUID) {
+         category: UUID? = nil) {
         self.id = id
+        self.expenseId = expenseId
+        self.accountId = accountId
         self.amount = amount
+        self.type = type
         self.date = date
         self.description = description
-        self.paymentMethodId = paymentMethodId
-        self.accountId = accountId
+        self.category = category
     }
 }

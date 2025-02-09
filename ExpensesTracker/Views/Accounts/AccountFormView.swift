@@ -7,7 +7,7 @@ struct AccountFormView: View {
     }
     
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var accountViewModel = AccountViewModel()
+    @EnvironmentObject private var accountViewModel: AccountViewModel
     @ObservedObject var incomeViewModel: IncomeViewModel
     
     let mode: Mode
@@ -26,7 +26,7 @@ struct AccountFormView: View {
        if case .edit(let account) = mode {
            // Inicializar las propiedades del account
            _name = State(initialValue: account.name)
-           _balance = State(initialValue: account.balance)
+           _balance = State(initialValue: account.currentBalance)
            _currency = State(initialValue: account.currency)
            _isDefault = State(initialValue: account.isDefault)
            
@@ -113,6 +113,15 @@ struct AccountFormView: View {
                         .frame(height: 190)
                     }
                 }
+                
+                if case .edit(let account) = mode {
+                    Section {
+                        NavigationLink(destination: TransactionsView(account: account)
+                            .environmentObject(accountViewModel)) {
+                            Label("Ver Transacciones", systemImage: "list.bullet")
+                        }
+                    }
+                }
             }
             .navigationTitle(title)
             .toolbar {
@@ -185,5 +194,6 @@ struct AccountFormView: View {
         case .add:
             accountViewModel.addAccount(account)
         }
+        dismiss()
     }
 }
