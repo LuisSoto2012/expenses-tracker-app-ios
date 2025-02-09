@@ -19,8 +19,13 @@ struct DebtDashboardView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddDebt = true }) {
                         Image(systemName: "plus.circle.fill")
+                            .font(.title3)
                     }
                 }
+            }
+            // Pull-to-Refresh
+            .refreshable {
+                viewModel.reloadDebts()
             }
             .sheet(isPresented: $showingAddDebt) {
                 AddDebtView(viewModel: viewModel)

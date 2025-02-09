@@ -7,6 +7,7 @@ class DebtViewModel: ObservableObject {
     
     @Published var debts: [Debt] = []
     @Published var selectedFilter: DebtStatus?
+    @Published var isLoadingDebts = false
     
     init(firebaseService: FirebaseService = .shared) {
         self.firebaseService = firebaseService
@@ -90,6 +91,17 @@ class DebtViewModel: ObservableObject {
             return debts.sorted { ($0.nextPaymentDate ?? .distantFuture) < ($1.nextPaymentDate ?? .distantFuture) }
         case .progress:
             return debts.sorted { $0.progress > $1.progress }
+        }
+    }
+    
+    func reloadDebts() {
+        isLoadingDebts = true
+
+        firebaseService.syncDebts { [weak self] debts in
+            DispatchQueue.main.async {
+                self?.debts = debts
+                self?.isLoadingDebts = false
+            }
         }
     }
 }

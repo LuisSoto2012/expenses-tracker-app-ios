@@ -1,5 +1,10 @@
 import SwiftUI
 
+enum ExpenseOption {
+    case general
+    case recurring
+}
+
 struct ExpensesView: View {
     @EnvironmentObject private var expenseViewModel: ExpenseViewModel
     @State private var showingAddExpense = false
@@ -8,41 +13,46 @@ struct ExpensesView: View {
     @State private var selectedYear: Int = Calendar.current.component(.year, from: Date())
     @State private var selectedDate = Date() // Para el modo día
     @State private var selectedCategoryId: UUID?
+    @State private var showingActionSheet = false
+    @State private var selectedOption: ExpenseOption = .general
 
     private var filteredExpenses: [Expense] {
         if isMonthMode {
             let date = Calendar.current.date(from: DateComponents(year: selectedYear, month: selectedMonth))!
-            return expenseViewModel.getFilteredExpenses(month: date, categoryId: selectedCategoryId)
+            return expenseViewModel.getFilteredExpenses(
+                month: date,
+                categoryId: selectedCategoryId,
+                isRecurring: selectedOption == .recurring  // Pasamos isRecurring según la opción seleccionada
+            )
         } else {
-            return expenseViewModel.getFilteredExpenses(month: selectedDate, categoryId: selectedCategoryId)
+            return expenseViewModel.getFilteredExpenses(
+                month: selectedDate,
+                categoryId: selectedCategoryId,
+                isRecurring: selectedOption == .recurring  // Igual aquí
+            )
         }
     }
     
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Filter Section
                 VStack(spacing: 16) {
-                // Toggle between Day and Month mode
                     Picker("Modo de Fecha", selection: $isMonthMode) {
                         Text("Por Mes").tag(true)
                         Text("Por Día").tag(false)
                     }
                     .pickerStyle(.segmented)
                     .padding(.horizontal)
-                    
-                    // Dynamic Date Picker
+
                     if isMonthMode {
-                        // Selector de Mes/Año
                         MonthYearPickerView(
                             minimumDate: Calendar.current.date(byAdding: .year, value: -10, to: Date())!,
                             maximumDate: Calendar.current.date(byAdding: .year, value: 10, to: Date())!,
                             selectedMonth: $selectedMonth,
                             selectedYear: $selectedYear
                         )
-                        .frame(height: 100) // Ajustar tamaño del selector
+                        .frame(height: 100)
                     } else {
-                        // Selector de Día
                         DatePicker(
                             "Seleccionar Día",
                             selection: $selectedDate,
@@ -51,7 +61,7 @@ struct ExpensesView: View {
                         .datePickerStyle(.compact)
                         .labelsHidden()
                     }
-                    // Category Filter
+
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
                             CategoryFilterChip(
@@ -60,7 +70,7 @@ struct ExpensesView: View {
                             ) {
                                 selectedCategoryId = nil
                             }
-                            
+
                             ForEach(expenseViewModel.categories) { category in
                                 CategoryFilterChip(
                                     name: category.name,
@@ -75,8 +85,7 @@ struct ExpensesView: View {
                 }
                 .padding(.vertical)
                 .background(Color(.systemBackground))
-                
-                // Expenses List
+
                 List {
                     ForEach(filteredExpenses) { expense in
                         ExpenseRowView(expense: expense)
@@ -85,17 +94,48 @@ struct ExpensesView: View {
                             .padding(.horizontal)
                             .padding(.vertical, 4)
                     }
-                    .onDelete(perform: deleteExpense) // Swipe to delete
+                    .onDelete(perform: deleteExpense)
+                }
+                .refreshable {
+                    expenseViewModel.reloadExpenses()
                 }
                 .listStyle(.plain)
             }
-            .navigationTitle("Gastos")
+            .navigationTitle(selectedOption == .general ? "Gastos Generales" : "Gastos Recurrentes")
             .toolbar {
-                Button(action: {
-                    showingAddExpense = true
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        showingActionSheet = true
+                    }) {
+                        Image(systemName: "ellipsis.circle.fill")
+                            .font(.title3)
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(22)
+                            .padding(5)
+                    }
+                    .actionSheet(isPresented: $showingActionSheet) {
+                        ActionSheet(
+                            title: Text("Selecciona una opción"),
+                            buttons: [
+                                .default(Text("Gastos Generales")) {
+                                    selectedOption = .general  // Asignamos el valor del enum
+                                },
+                                .default(Text("Gastos Recurrentes")) {
+                                    selectedOption = .recurring  // Asignamos el valor del enum
+                                },
+                                .cancel()
+                            ]
+                        )
+                    }
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showingAddExpense = true
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title3)
+                    }
                 }
             }
         }

@@ -45,13 +45,17 @@ struct HomeView: View {
                     
                     // Recent expenses list
                     LazyVStack(spacing: 12) {
-                        ForEach(expenseViewModel.expenses) { expense in
+                        ForEach(expenseViewModel.getRecentExpenses()) { expense in
                             ExpenseRowView(expense: expense)
                         }
                     }
                     .padding(.horizontal)
                 }
                 .padding(.top)
+            }
+            .refreshable {
+                // Acción para recargar los datos
+                expenseViewModel.reloadExpenses()
             }
             .navigationTitle("Inicio")
         }

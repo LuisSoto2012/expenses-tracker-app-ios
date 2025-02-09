@@ -87,9 +87,49 @@ class ExpenseViewModel: ObservableObject {
             firebaseService.saveExpense(expense)
         }
     }
+    
+    func updateExpense(_ expense: Expense, newAmount: Double) {
+        guard let index = expenses.firstIndex(where: { $0.id == expense.id }) else { return }
+        
+        // Crear una copia del gasto con la nueva cantidad
+        var updatedExpense = expenses[index]
+        updatedExpense.amount = newAmount
+        
+        // Guardar los cambios en Firebase
+        firebaseService.saveExpense(updatedExpense)
+        
+        // Actualizar la lista local de gastos
+        expenses[index] = updatedExpense
+        
+        // Recalcular el total mensual de gastos (si aplica)
+        calculateTotalMonthlyExpenses()
+    }
         
     func deleteExpense(_ expense: Expense) {
         firebaseService.deleteExpense(id: expense.id)
+    }
+    
+    func getRecentExpenses() -> [Expense] {
+        return expenses.filter { expense in
+            if expense.isRecurring {
+                return expense.isPaid ?? false // Solo mostrar recurrentes si están pagadas
+            } else {
+                return true // Mostrar todos los gastos no recurrentes
+            }
+        }
+        .sorted { $0.date > $1.date } // Ordenar por fecha descendente
+    }
+    
+    func reloadExpenses() {
+        isLoading = true
+
+        firebaseService.syncExpenses { [weak self] expenses in
+            DispatchQueue.main.async {
+                self?.expenses = expenses
+                self?.calculateTotalMonthlyExpenses()
+                self?.isLoading = false
+            }
+        }
     }
     
     // MARK: - Category Methods
@@ -152,7 +192,7 @@ class ExpenseViewModel: ObservableObject {
     
     // MARK: - Helper Methods
     
-    func getFilteredExpenses(month: Date, categoryId: UUID?) -> [Expense] {
+    func getFilteredExpenses(month: Date, categoryId: UUID?, isRecurring: Bool = false) -> [Expense] {
         let calendar = Calendar.current
         let monthComponent = calendar.component(.month, from: month)
         let yearComponent = calendar.component(.year, from: month)
@@ -163,8 +203,11 @@ class ExpenseViewModel: ObservableObject {
             
             let monthMatches = expenseMonth == monthComponent && expenseYear == yearComponent
             let categoryMatches = categoryId == nil || expense.categoryId == categoryId
+                    
+            // Verificar si el gasto es recurrente, si corresponde
+            let recurringMatches = isRecurring == expense.isRecurring
             
-            return monthMatches && categoryMatches
+            return monthMatches && categoryMatches && recurringMatches
         }
         .sorted { $0.date > $1.date }
     }
@@ -196,8 +239,11 @@ class ExpenseViewModel: ObservableObject {
             let expenseMonth = calendar.component(.month, from: expense.date)
             let expenseYear = calendar.component(.year, from: expense.date)
             
+            // Considerar los montos solo si no es recurrente o si es recurrente y está pagado
             if expenseMonth == month && expenseYear == year {
-                categoryTotals[expense.categoryId, default: 0] += expense.amount
+                if !expense.isRecurring || (expense.isRecurring && (expense.isPaid ?? false)) {
+                    categoryTotals[expense.categoryId, default: 0] += expense.amount
+                }
             }
         }
         
@@ -229,7 +275,8 @@ class ExpenseViewModel: ObservableObject {
             .filter { expense in
                 let expenseMonth = calendar.component(.month, from: expense.date)
                 let expenseYear = calendar.component(.year, from: expense.date)
-                return expenseMonth == month && expenseYear == year
+                return expenseMonth == month && expenseYear == year &&
+                    (!expense.isRecurring || (expense.isRecurring && (expense.isPaid ?? false)))
             }
             .reduce(0) { $0 + $1.amount }
     }
@@ -244,8 +291,36 @@ class ExpenseViewModel: ObservableObject {
             .filter { expense in
                 let expenseMonth = calendar.component(.month, from: expense.date)
                 let expenseYear = calendar.component(.year, from: expense.date)
-                return expenseMonth == currentMonth && expenseYear == currentYear
+                return expenseMonth == currentMonth && expenseYear == currentYear &&
+                    (!expense.isRecurring || (expense.isRecurring && (expense.isPaid ?? false)))
             }
             .reduce(0) { $0 + $1.amount }
     }
-} 
+    
+    func getRecurringExpenses(forMonth month: Int, year: Int) -> [Expense] {
+        expenses.filter { expense in
+            let isRecurring = expense.isRecurring
+            let expenseDate = expense.date
+            let expenseMonth = Calendar.current.component(.month, from: expenseDate)
+            let expenseYear = Calendar.current.component(.year, from: expenseDate)
+            return isRecurring && expenseMonth == month && expenseYear == year
+        }
+    }
+
+    func markAsPaid(expenseId: UUID) {
+        guard let index = expenses.firstIndex(where: { $0.id == expenseId }) else { return }
+        
+        // Crear una copia del gasto con el estado actualizado
+        var updatedExpense = expenses[index]
+        updatedExpense.isPaid = true
+        
+        // Actualizar el estado en Firebase
+        firebaseService.saveExpense(updatedExpense)
+        
+        // Actualizar el estado local
+        expenses[index] = updatedExpense
+        
+        // Recalcular el total mensual (si aplica)
+        calculateTotalMonthlyExpenses()
+    }
+}
