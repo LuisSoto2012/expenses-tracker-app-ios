@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct ExpenseRowView: View {
-    let expense: Expense
+    @Binding var expense: Expense
+    //@StateObject private var viewModel = ExpenseViewModel()
     @EnvironmentObject private var expenseViewModel: ExpenseViewModel
     @State private var showDeleteConfirmation = false
     @State private var expenseToDelete: Expense?
@@ -89,7 +90,7 @@ struct ExpenseRowView: View {
                             isLoadingPayment = true
                             // Marcar como pagado después de un breve retraso
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                                expenseViewModel.markAsPaid(expenseId: expense.id)
+                                markAsPaid()
                                 isLoadingPayment = false
                             }
                         }
@@ -201,5 +202,11 @@ struct ExpenseRowView: View {
                 secondaryButton: .cancel(Text("Cancelar"))
             )
         }
+    }
+    
+    private func markAsPaid() {
+        expenseViewModel.markAsPaid(expenseId: expense.id)
+        // La actualización del expense se reflejará automáticamente en la UI
+        // gracias al binding
     }
 }

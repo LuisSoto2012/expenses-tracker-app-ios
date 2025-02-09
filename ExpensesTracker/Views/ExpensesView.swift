@@ -93,11 +93,20 @@ struct ExpensesView: View {
 
                 List {
                     ForEach(filteredExpenses) { expense in
-                        ExpenseRowView(expense: expense)
-                            .listRowInsets(EdgeInsets())
-                            .listRowBackground(Color.clear)
-                            .padding(.horizontal)
-                            .padding(.vertical, 4)
+                        ExpenseRowView(
+                            expense: Binding(
+                                get: { expense },
+                                set: { newValue in
+                                    if let index = expenseViewModel.expenses.firstIndex(where: { $0.id == expense.id }) {
+                                        expenseViewModel.expenses[index] = newValue
+                                    }
+                                }
+                            )
+                        )
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                        .padding(.horizontal)
+                        .padding(.vertical, 4)
                     }
                     .onDelete(perform: deleteExpense)
                 }

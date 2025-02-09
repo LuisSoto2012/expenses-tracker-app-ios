@@ -23,6 +23,7 @@ struct ExpensesTrackerApp: App {
             let options = FirebaseOptions(contentsOfFile: filePath)
             FirebaseApp.configure(options: options!)
         } else {
+            FirebaseApp.configure()
             print("No se encontró el archivo de configuración de Firebase para el entorno de pruebas.")
         }
         
