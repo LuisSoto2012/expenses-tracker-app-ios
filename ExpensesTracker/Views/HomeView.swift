@@ -68,7 +68,16 @@ struct HomeView: View {
                     // Recent expenses list
                     LazyVStack(spacing: 12) {
                         ForEach(expenseViewModel.getRecentExpenses()) { expense in
-                            ExpenseRowView(expense: expense)
+                            ExpenseRowView(
+                                expense: Binding(
+                                    get: { expense },
+                                    set: { newValue in
+                                        if let index = expenseViewModel.expenses.firstIndex(where: { $0.id == expense.id }) {
+                                            expenseViewModel.expenses[index] = newValue
+                                        }
+                                    }
+                                )
+                            )
                         }
                     }
                     .padding(.horizontal)

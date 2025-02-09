@@ -18,8 +18,14 @@ struct ExpensesTrackerApp: App {
     @StateObject private var incomeViewModel: IncomeViewModel
     
     init() {
-        // Configure Firebase
-        FirebaseApp.configure()
+        // Configure Firebase with custom plist for the test environment
+        if let filePath = Bundle.main.path(forResource: "GoogleService-Info-test", ofType: "plist") {
+            let options = FirebaseOptions(contentsOfFile: filePath)
+            FirebaseApp.configure(options: options!)
+        } else {
+            FirebaseApp.configure()
+            print("No se encontró el archivo de configuración de Firebase para el entorno de pruebas.")
+        }
         
         // Initialize ViewModels using factory
         let factory = ViewModelFactory.shared

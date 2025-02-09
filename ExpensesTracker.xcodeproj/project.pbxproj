@@ -18,6 +18,16 @@
 		6B7183902D3CB331004C6DEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B71838E2D3CB331004C6DEA /* GoogleService-Info.plist */; };
 		6B7183912D3CB331004C6DEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6B71838E2D3CB331004C6DEA /* GoogleService-Info.plist */; };
 		6B7CBB982D434A5100376011 /* ConfettiView in Frameworks */ = {isa = PBXBuildFile; productRef = 6B7CBB972D434A5100376011 /* ConfettiView */; };
+		6BDDFA582D549ACE00786630 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6BDDFA4E2D549ACE00786630 /* FirebaseDatabase */; };
+		6BDDFA592D549ACE00786630 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6BDDFA4F2D549ACE00786630 /* FirebaseFirestore */; };
+		6BDDFA5A2D549ACE00786630 /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6BDDFA522D549ACE00786630 /* SFSymbolsPicker */; };
+		6BDDFA5B2D549ACE00786630 /* ConfettiView in Frameworks */ = {isa = PBXBuildFile; productRef = 6BDDFA542D549ACE00786630 /* ConfettiView */; };
+		6BDDFA5C2D549ACE00786630 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6BDDFA4D2D549ACE00786630 /* FirebaseCore */; };
+		6BDDFA5D2D549ACE00786630 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 6BDDFA502D549ACE00786630 /* FirebaseFirestoreCombine-Community */; };
+		6BDDFA5E2D549ACE00786630 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6BDDFA4B2D549ACE00786630 /* FirebaseAuth */; };
+		6BDDFA5F2D549ACE00786630 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6BDDFA512D549ACE00786630 /* FirebaseStorage */; };
+		6BDDFA6B2D549ED800786630 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6BDDFA692D549CA300786630 /* CoreAudio.framework */; };
+		6BDDFA9E2D54A0AA00786630 /* GoogleService-Info-test.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6BDDFA9D2D54A0AA00786630 /* GoogleService-Info-test.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +52,9 @@
 		6B7183342D3A3F4F004C6DEA /* ExpensesTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExpensesTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B71833E2D3A3F4F004C6DEA /* ExpensesTrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExpensesTrackerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B71838E2D3CB331004C6DEA /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		6BDDFA652D549ACE00786630 /* ExpensesTracker Test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ExpensesTracker Test.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BDDFA692D549CA300786630 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		6BDDFA9D2D54A0AA00786630 /* GoogleService-Info-test.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-test.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -92,12 +105,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6BDDFA572D549ACE00786630 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6BDDFA6B2D549ED800786630 /* CoreAudio.framework in Frameworks */,
+				6BDDFA582D549ACE00786630 /* FirebaseDatabase in Frameworks */,
+				6BDDFA592D549ACE00786630 /* FirebaseFirestore in Frameworks */,
+				6BDDFA5A2D549ACE00786630 /* SFSymbolsPicker in Frameworks */,
+				6BDDFA5B2D549ACE00786630 /* ConfettiView in Frameworks */,
+				6BDDFA5C2D549ACE00786630 /* FirebaseCore in Frameworks */,
+				6BDDFA5D2D549ACE00786630 /* FirebaseFirestoreCombine-Community in Frameworks */,
+				6BDDFA5E2D549ACE00786630 /* FirebaseAuth in Frameworks */,
+				6BDDFA5F2D549ACE00786630 /* FirebaseStorage in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		6B5E3A222D40D3E300B87A2E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6BDDFA692D549CA300786630 /* CoreAudio.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -110,6 +140,7 @@
 				6B7183412D3A3F4F004C6DEA /* ExpensesTrackerUITests */,
 				6B7183252D3A3F4D004C6DEA /* Products */,
 				6B71838E2D3CB331004C6DEA /* GoogleService-Info.plist */,
+				6BDDFA9D2D54A0AA00786630 /* GoogleService-Info-test.plist */,
 				6B5E3A222D40D3E300B87A2E /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -120,6 +151,7 @@
 				6B7183242D3A3F4D004C6DEA /* ExpensesTracker.app */,
 				6B7183342D3A3F4F004C6DEA /* ExpensesTrackerTests.xctest */,
 				6B71833E2D3A3F4F004C6DEA /* ExpensesTrackerUITests.xctest */,
+				6BDDFA652D549ACE00786630 /* ExpensesTracker Test.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -203,6 +235,36 @@
 			productReference = 6B71833E2D3A3F4F004C6DEA /* ExpensesTrackerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		6BDDFA4A2D549ACE00786630 /* ExpensesTracker Test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6BDDFA622D549ACE00786630 /* Build configuration list for PBXNativeTarget "ExpensesTracker Test" */;
+			buildPhases = (
+				6BDDFA562D549ACE00786630 /* Sources */,
+				6BDDFA572D549ACE00786630 /* Frameworks */,
+				6BDDFA602D549ACE00786630 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6B7183262D3A3F4D004C6DEA /* ExpensesTracker */,
+			);
+			name = "ExpensesTracker Test";
+			packageProductDependencies = (
+				6BDDFA4B2D549ACE00786630 /* FirebaseAuth */,
+				6BDDFA4D2D549ACE00786630 /* FirebaseCore */,
+				6BDDFA4E2D549ACE00786630 /* FirebaseDatabase */,
+				6BDDFA4F2D549ACE00786630 /* FirebaseFirestore */,
+				6BDDFA502D549ACE00786630 /* FirebaseFirestoreCombine-Community */,
+				6BDDFA512D549ACE00786630 /* FirebaseStorage */,
+				6BDDFA522D549ACE00786630 /* SFSymbolsPicker */,
+				6BDDFA542D549ACE00786630 /* ConfettiView */,
+			);
+			productName = ExpensesTracker;
+			productReference = 6BDDFA652D549ACE00786630 /* ExpensesTracker Test.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -248,6 +310,7 @@
 				6B7183232D3A3F4D004C6DEA /* ExpensesTracker */,
 				6B7183332D3A3F4F004C6DEA /* ExpensesTrackerTests */,
 				6B71833D2D3A3F4F004C6DEA /* ExpensesTrackerUITests */,
+				6BDDFA4A2D549ACE00786630 /* ExpensesTracker Test */,
 			);
 		};
 /* End PBXProject section */
@@ -277,6 +340,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6BDDFA602D549ACE00786630 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6BDDFA9E2D54A0AA00786630 /* GoogleService-Info-test.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -295,6 +366,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		6B71833A2D3A3F4F004C6DEA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6BDDFA562D549ACE00786630 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -447,6 +525,7 @@
 				DEVELOPMENT_TEAM = 4W2S5L89AS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Expenses Tracker";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -476,6 +555,7 @@
 				DEVELOPMENT_TEAM = 4W2S5L89AS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Expenses Tracker";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -566,6 +646,66 @@
 			};
 			name = Release;
 		};
+		6BDDFA632D549ACE00786630 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ExpensesTracker/Preview Content\"";
+				DEVELOPMENT_TEAM = 4W2S5L89AS;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Expenses Tracker Test";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "lsotof-dev.ExpensesTracker.test";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6BDDFA642D549ACE00786630 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"ExpensesTracker/Preview Content\"";
+				DEVELOPMENT_TEAM = 4W2S5L89AS;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Expenses Tracker Test";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "lsotof-dev.ExpensesTracker.test";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -605,6 +745,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		6BDDFA622D549ACE00786630 /* Build configuration list for PBXNativeTarget "ExpensesTracker Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6BDDFA632D549ACE00786630 /* Debug */,
+				6BDDFA642D549ACE00786630 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -625,6 +774,30 @@
 			};
 		};
 		6B7CBB962D4349AE00376011 /* XCRemoteSwiftPackageReference "ConfettiView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/blsage/ConfettiView";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		6BDDFA4C2D549ACE00786630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.7.0;
+			};
+		};
+		6BDDFA532D549ACE00786630 /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alessiorubicini/SFSymbolsPicker";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.6;
+			};
+		};
+		6BDDFA552D549ACE00786630 /* XCRemoteSwiftPackageReference "ConfettiView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/blsage/ConfettiView";
 			requirement = {
@@ -673,6 +846,46 @@
 		6B7CBB972D434A5100376011 /* ConfettiView */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6B7CBB962D4349AE00376011 /* XCRemoteSwiftPackageReference "ConfettiView" */;
+			productName = ConfettiView;
+		};
+		6BDDFA4B2D549ACE00786630 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BDDFA4C2D549ACE00786630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		6BDDFA4D2D549ACE00786630 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BDDFA4C2D549ACE00786630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		6BDDFA4E2D549ACE00786630 /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BDDFA4C2D549ACE00786630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		6BDDFA4F2D549ACE00786630 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BDDFA4C2D549ACE00786630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		6BDDFA502D549ACE00786630 /* FirebaseFirestoreCombine-Community */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BDDFA4C2D549ACE00786630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseFirestoreCombine-Community";
+		};
+		6BDDFA512D549ACE00786630 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BDDFA4C2D549ACE00786630 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		6BDDFA522D549ACE00786630 /* SFSymbolsPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BDDFA532D549ACE00786630 /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */;
+			productName = SFSymbolsPicker;
+		};
+		6BDDFA542D549ACE00786630 /* ConfettiView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6BDDFA552D549ACE00786630 /* XCRemoteSwiftPackageReference "ConfettiView" */;
 			productName = ConfettiView;
 		};
 /* End XCSwiftPackageProductDependency section */
