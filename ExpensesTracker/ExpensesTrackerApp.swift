@@ -12,6 +12,8 @@ import FirebaseCore
 struct ExpensesTrackerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var expenseViewModel = ExpenseViewModel()
+    @StateObject private var incomeViewModel = IncomeViewModel()
+    @StateObject private var accountViewModel = AccountViewModel()
     
     init() {
         FirebaseApp.configure()
@@ -19,7 +21,7 @@ struct ExpensesTrackerApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(expenseViewModel: expenseViewModel)
+            ContentView(expenseViewModel: expenseViewModel, incomeViewModel: incomeViewModel, accountViewModel: accountViewModel)
                 .environmentObject(expenseViewModel)
         }
     }

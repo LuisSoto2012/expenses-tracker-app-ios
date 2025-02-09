@@ -8,6 +8,7 @@ class ExpenseViewModel: ObservableObject {
     @Published var budgets: [Budget] = []
     @Published var totalMonthlyExpenses: Double = 0
     @Published var isLoading = false
+    @Published var needsRefresh: Bool = false
     
     private let firebaseService = FirebaseService()
     
@@ -128,6 +129,7 @@ class ExpenseViewModel: ObservableObject {
                 self?.expenses = expenses
                 self?.calculateTotalMonthlyExpenses()
                 self?.isLoading = false
+                self?.needsRefresh.toggle()
             }
         }
     }
@@ -203,8 +205,6 @@ class ExpenseViewModel: ObservableObject {
             
             let monthMatches = expenseMonth == monthComponent && expenseYear == yearComponent
             let categoryMatches = categoryId == nil || expense.categoryId == categoryId
-                    
-            // Verificar si el gasto es recurrente, si corresponde
             let recurringMatches = isRecurring == expense.isRecurring
             
             return monthMatches && categoryMatches && recurringMatches
@@ -314,13 +314,18 @@ class ExpenseViewModel: ObservableObject {
         var updatedExpense = expenses[index]
         updatedExpense.isPaid = true
         
-        // Actualizar el estado en Firebase
+        // Actualizar el estado local primero
+        DispatchQueue.main.async { [weak self] in
+            self?.expenses[index] = updatedExpense
+            // Forzar la actualización de la vista
+            self?.objectWillChange.send()
+            self?.needsRefresh.toggle()
+        }
+        
+        // Actualizar en Firebase
         firebaseService.saveExpense(updatedExpense)
         
-        // Actualizar el estado local
-        expenses[index] = updatedExpense
-        
-        // Recalcular el total mensual (si aplica)
+        // Recalcular el total mensual
         calculateTotalMonthlyExpenses()
     }
 }

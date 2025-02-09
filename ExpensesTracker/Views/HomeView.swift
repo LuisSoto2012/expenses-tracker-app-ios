@@ -1,12 +1,24 @@
 import SwiftUI
 
 struct HomeView: View {
+    @EnvironmentObject private var accountViewModel: AccountViewModel
     @EnvironmentObject private var expenseViewModel: ExpenseViewModel
     
+    // Obtener la cuenta predeterminada
+    private var defaultAccount: Account? {
+        accountViewModel.accounts.first(where: { $0.isDefault })
+    }
+
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    
+                    // Información de la cuenta predeterminada
+                    if let account = defaultAccount {
+                        AccountSummaryView(account: account)
+                    }
+                    
                     // Monthly summary card
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Gastos Mensuales")
@@ -59,6 +71,40 @@ struct HomeView: View {
             }
             .navigationTitle("Inicio")
         }
+    }
+}
+
+// Vista de Resumen de Cuenta Predeterminada
+struct AccountSummaryView: View {
+    let account: Account
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Cuenta Predeterminada")
+                .font(.headline)
+                .foregroundColor(.secondary)
+            
+            Text(account.name)
+                .font(.title2)
+                .fontWeight(.bold)
+            
+            HStack {
+                Text("Saldo: ")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Text(verbatim: CurrencyFormatter.pen.string(from: NSNumber(value: account.balance)) ?? "S/. 0.00")
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundColor(account.balance >= 0 ? .green : .red)
+            }
+            
+            Divider()
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(radius: 2)
+        .padding(.horizontal)
     }
 }
 

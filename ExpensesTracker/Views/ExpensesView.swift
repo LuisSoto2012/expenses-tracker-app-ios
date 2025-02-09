@@ -6,7 +6,7 @@ enum ExpenseOption {
 }
 
 struct ExpensesView: View {
-    @EnvironmentObject private var expenseViewModel: ExpenseViewModel
+    @StateObject private var expenseViewModel = ExpenseViewModel()
     @State private var showingAddExpense = false
     @State private var isMonthMode = true // Alternar entre modo Mes y Día
     @State private var selectedMonth: Int = Calendar.current.component(.month, from: Date())
@@ -15,6 +15,7 @@ struct ExpensesView: View {
     @State private var selectedCategoryId: UUID?
     @State private var showingActionSheet = false
     @State private var selectedOption: ExpenseOption = .general
+    @State private var refreshToggle = false
 
     private var filteredExpenses: [Expense] {
         if isMonthMode {
@@ -96,51 +97,44 @@ struct ExpensesView: View {
                     }
                     .onDelete(perform: deleteExpense)
                 }
-                .refreshable {
-                    expenseViewModel.reloadExpenses()
-                }
+                .id(expenseViewModel.needsRefresh)
                 .listStyle(.plain)
             }
             .navigationTitle(selectedOption == .general ? "Gastos Generales" : "Gastos Recurrentes")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        showingActionSheet = true
-                    }) {
-                        Image(systemName: "ellipsis.circle.fill")
-                            .font(.title3)
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(22)
-                            .padding(5)
-                    }
-                    .actionSheet(isPresented: $showingActionSheet) {
-                        ActionSheet(
-                            title: Text("Selecciona una opción"),
-                            buttons: [
-                                .default(Text("Gastos Generales")) {
-                                    selectedOption = .general  // Asignamos el valor del enum
-                                },
-                                .default(Text("Gastos Recurrentes")) {
-                                    selectedOption = .recurring  // Asignamos el valor del enum
-                                },
-                                .cancel()
-                            ]
-                        )
-                    }
+            .navigationBarItems(
+                leading: Button(action: {
+                    showingActionSheet = true
+                }) {
+                    Image(systemName: "ellipsis.circle.fill")
+                        .font(.title3)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(22)
+                        .padding(5)
                 }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingAddExpense = true
-                    }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title3)
-                    }
+                .actionSheet(isPresented: $showingActionSheet) {
+                    ActionSheet(
+                        title: Text("Selecciona una opción"),
+                        buttons: [
+                            .default(Text("Gastos Generales")) {
+                                selectedOption = .general
+                            },
+                            .default(Text("Gastos Recurrentes")) {
+                                selectedOption = .recurring
+                            },
+                            .cancel()
+                        ]
+                    )
+                },
+                trailing: Button(action: {
+                    showingAddExpense = true
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
                 }
-            }
+            )
         }
         .sheet(isPresented: $showingAddExpense) {
-            AddExpenseView()
+            AddExpenseView(isRecurring: selectedOption == .recurring)
         }
     }
     

@@ -3,16 +3,23 @@ import SwiftUI
 struct AddExpenseView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var expenseViewModel: ExpenseViewModel
+    @EnvironmentObject private var incomeViewModel: IncomeViewModel
+    @EnvironmentObject private var accountViewModel: AccountViewModel
     
     @State private var name: String = ""
     @State private var amount: Double = 0.0
     @State private var notes: String = ""
     @State private var date = Date()
     @State private var selectedCategoryId: UUID?
-    @State private var isRecurring = false
     @State private var recurrenceInterval: RecurrenceInterval = .monthly
     @State private var isFixed = false
     @State private var endDate = Date()
+    @State private var selectedPaymentMethod: PaymentMethod?
+    @State private var isRecurring: Bool
+    
+    init(isRecurring: Bool) {
+        _isRecurring = State(initialValue: isRecurring)
+    }
     
     var body: some View {
         NavigationView {
@@ -59,9 +66,44 @@ struct AddExpenseView: View {
                     Text("Detalles")
                 }
                 
+                if !incomeViewModel.paymentMethods.isEmpty {
+                    Section("Método de Pago") {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: 15) {
+                                ForEach(incomeViewModel.paymentMethods) { method in
+                                    PaymentMethodCard(
+                                        paymentMethod: method,
+                                        isSelected: .init(
+                                            get: {
+                                                // Verifica si el método de pago actual es el seleccionado
+                                                selectedPaymentMethod?.id == method.id
+                                            },
+                                            set: { _ in }
+                                        ))
+                                        .frame(width: 250, height: 150)
+                                        .onTapGesture {
+                                            selectedPaymentMethod = method
+                                        }
+//                                        .overlay(
+//                                            RoundedRectangle(cornerRadius: 15)
+//                                                .stroke(
+//                                                    selectedPaymentMethod?.id == method.id ? Color.blue.opacity(0.7) : Color.clear,
+//                                                    lineWidth: selectedPaymentMethod?.id == method.id ? 4 : 0
+//                                                )
+//                                                .shadow(color: selectedPaymentMethod?.id == method.id ? Color.blue : Color.clear, radius: 10, x: 0, y: 0)
+//                                                .animation(.easeInOut(duration: 0.3), value: selectedPaymentMethod?.id)
+//                                        )
+                                }
+                            }
+                            .padding(.horizontal, 30)
+                        }
+                        .frame(height: 190)
+                    }
+                }
+                
                 // Recurring Expense Section
                 Section {
-                    Toggle("Gasto Recurrente", isOn: $isRecurring)
+                    Toggle("Es Recurrente", isOn: $isRecurring)
                     
                     if isRecurring {
                         Picker("Intervalo", selection: $recurrenceInterval) {
@@ -97,7 +139,7 @@ struct AddExpenseView: View {
     }
     
     private var isFormValid: Bool {
-        return amount > 0 && selectedCategoryId != nil
+        return amount > 0 && selectedCategoryId != nil && selectedPaymentMethod != nil
     }
     
     private func saveExpense() {
@@ -113,7 +155,8 @@ struct AddExpenseView: View {
             categoryId: categoryId,
             isRecurring: isRecurring,
             recurrenceInterval: isRecurring ? recurrenceInterval : nil,
-            isFixed: isRecurring ? isFixed : nil
+            isFixed: isRecurring ? isFixed : nil,
+            paymentMethodId: selectedPaymentMethod?.id
         )
         
         if isRecurring {
@@ -121,6 +164,10 @@ struct AddExpenseView: View {
         } else {
             expenseViewModel.addExpense(expense)
         }
+        
+        // Registrar la transacción en la cuenta
+        accountViewModel.registerExpense(expense)
+        
         dismiss()
     }
 }

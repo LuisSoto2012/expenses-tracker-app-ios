@@ -4,76 +4,159 @@ import SFSymbolsPicker
 
 struct SettingsView: View {
     @EnvironmentObject var expenseViewModel: ExpenseViewModel
+    @StateObject private var incomeViewModel = IncomeViewModel()
     @State private var showingCategorySheet = false
     @State private var showingExportSheet = false
     @State private var showingSignOutAlert = false
+    @State private var showingDeleteConfirmation = false
+    @State private var showingSelectiveDeleteConfirmation = false
+    @State private var selectedDataToDelete: String? = nil
+    @State private var showingSuccessMessage = false
+    @State private var successMessage = ""
+    
+    @StateObject private var firebaseService = FirebaseService.shared
+    
+    // Mapeo de nombres en español a inglés
+    let spanishToEnglishMap: [String: String] = [
+        "Cuentas": "accounts",
+        "Presupuestos": "budgets",
+        "Categorias": "categories",
+        "Deudas": "debts",
+        "Gastos": "expenses",
+        "Ingresos": "incomes",
+        "Métodos de Pago": "paymentMethods"
+    ]
     
     var body: some View {
         NavigationView {
             List {
-                // Categories Section
-                Section("Categorías") {
-                    Button(action: { showingCategorySheet = true }) {
-                        HStack {
-                            Label {
-                                Text("Administrar Categorías")
-                                    .foregroundColor(.primary)
-                            } icon: {
-                                Image(systemName: "tag")
-                            }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-                
-                // Budget Section
-                Section("Presupuesto") {
-                    NavigationLink(destination: BudgetSettingsView().environmentObject(expenseViewModel)) {
-                        Label("Configuración de Presupuesto", systemImage: "chart.bar")
-                    }
-                }
+                // Accounts Section
+               Section("Cuentas") {
+                   NavigationLink(destination: AccountManagementView()) {
+                       Label("Gestionar Cuentas", systemImage: "banknote")
+                   }
+               }
+               
+               // Incomes section
+               Section("Income & Payments") {
+                   NavigationLink(destination: IncomeListView(viewModel: incomeViewModel)) {
+                       Label("Fuente de Ingresos", systemImage: "dollarsign.circle")
+                   }
+                   
+                   NavigationLink(destination: PaymentMethodsView(viewModel: incomeViewModel)) {
+                       Label("Metodos de Pago", systemImage: "creditcard")
+                   }
+               }
+               
+               // Categories Section
+               Section("Categorías") {
+                   Button(action: { showingCategorySheet = true }) {
+                       HStack {
+                           Label {
+                               Text("Administrar Categorías")
+                                   .foregroundColor(.primary)
+                           } icon: {
+                               Image(systemName: "tag")
+                           }
+                           Spacer()
+                           Image(systemName: "chevron.right")
+                               .foregroundColor(.secondary)
+                       }
+                   }
+               }
+               
+               // Budget Section
+               Section("Presupuesto") {
+                   NavigationLink(destination: BudgetSettingsView().environmentObject(expenseViewModel)) {
+                       Label("Configuración de Presupuesto", systemImage: "chart.bar")
+                   }
+               }
+               
+               // Data Management
+               Section("Datos") {
+                   Button(action: { showingExportSheet = true }) {
+                       Label {
+                           Text("Exportar Datos")
+                               .foregroundColor(.primary)
+                       } icon: {
+                           Image(systemName: "square.and.arrow.up")
+                       }
+                   }
+               }
+               
+               // Account Section
+               Section("Cuenta") {
+                   if let user = Auth.auth().currentUser {
+                       HStack {
+                           Label("Correo Electrónico", systemImage: "envelope")
+                           Spacer()
+                           Text(user.email ?? "")
+                               .foregroundColor(.secondary)
+                       }
+                       
+                       Button(role: .destructive, action: { showingSignOutAlert = true }) {
+                           Label("Cerrar Sesión", systemImage: "rectangle.portrait.and.arrow.right")
+                       }
+                   }
+               }
+               
+               // About Section
+               Section("Acerca de") {
+                   HStack {
+                       Label("Versión", systemImage: "info.circle")
+                       Spacer()
+                       Text("1.0.0")
+                           .foregroundColor(.secondary)
+                   }
+               }
                 
                 // Data Management
                 Section("Datos") {
                     Button(action: { showingExportSheet = true }) {
-                        Label {
-                            Text("Exportar Datos")
-                                .foregroundColor(.primary)
-                        } icon: {
-                            Image(systemName: "square.and.arrow.up")
-                        }
+                        Label("Exportar Datos", systemImage: "square.and.arrow.up")
+                    }
+                    
+                    // Nueva opción para eliminar datos específicos
+                    Button(action: { showingSelectiveDeleteConfirmation = true }) {
+                        Label("Eliminar Datos Específicos", systemImage: "trash.circle")
+                            .foregroundColor(.red)
+                    }
+                    
+                    // Opción para eliminar todo
+                    Button(action: { showingDeleteConfirmation = true }) {
+                        Label("Eliminar Todo", systemImage: "trash")
+                            .foregroundColor(.red)
                     }
                 }
-                
-                // Account Section
-                Section("Cuenta") {
-                    if let user = Auth.auth().currentUser {
-                        HStack {
-                            Label("Correo Electrónico", systemImage: "envelope")
-                            Spacer()
-                            Text(user.email ?? "")
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Button(role: .destructive, action: { showingSignOutAlert = true }) {
-                            Label("Cerrar Sesión", systemImage: "rectangle.portrait.and.arrow.right")
+                .alert("Eliminar Datos Específicos", isPresented: $showingSelectiveDeleteConfirmation) {
+                    Button("Cancelar", role: .cancel) { }
+                    ForEach(["Cuentas", "Presupuestos", "Categorias", "Deudas", "Gastos", "Ingresos", "Métodos de Pago"], id: \.self) { item in
+                        Button(item, role: .destructive) {
+                            if let englishKey = spanishToEnglishMap[item] {
+                                deleteSpecificData(type: englishKey)
+                            }
                         }
                     }
+                } message: {
+                    Text("Selecciona qué datos deseas eliminar.")
                 }
-                
-                // About Section
-                Section("Acerca de") {
-                    HStack {
-                        Label("Versión", systemImage: "info.circle")
-                        Spacer()
-                        Text("1.0.0")
-                            .foregroundColor(.secondary)
+                .alert("Eliminar Todo", isPresented: $showingDeleteConfirmation) {
+                    Button("Cancelar", role: .cancel) { }
+                    Button("Eliminar", role: .destructive) {
+                        deleteAllData()
                     }
+                } message: {
+                    Text("¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.")
                 }
             }
             .navigationTitle("Configuración")
+            .alert(isPresented: $showingSuccessMessage) {
+                Alert(
+                    title: Text("Éxito"),
+                    message: Text(successMessage),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
         }
         .sheet(isPresented: $showingCategorySheet) {
             CategoryManagementView()
@@ -86,6 +169,26 @@ struct SettingsView: View {
             }
         } message: {
             Text("¿Estás seguro de que deseas cerrar sesión?")
+        }
+    }
+    
+    private func deleteAllData() {
+        // Llamamos a FirebaseService para eliminar las colecciones
+        firebaseService.deleteAllCollectionsExceptCategories()
+        successMessage = "Todos los datos han sido eliminados exitosamente."
+        showingSuccessMessage = true
+    }
+    
+    private func deleteSpecificData(type: String) {
+        firebaseService.deleteCollection(collectionName: type)
+        
+        if type == "accounts" {
+            firebaseService.deleteCollection(collectionName: "transactions")
+        }
+        
+        if let spanishName = spanishToEnglishMap.first(where: { $0.value == type })?.key {
+            successMessage = "Los datos de \(spanishName) han sido eliminados exitosamente."
+            showingSuccessMessage = true
         }
     }
 }
