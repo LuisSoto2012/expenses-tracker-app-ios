@@ -47,6 +47,14 @@ struct ContentView: View {
                 .tabItem {
                     Label("Configuración", systemImage: "gear") // Translated text
                 }
+            
+            NavigationView {
+                AIAssistantView(expenseViewModel: expenseViewModel)
+            }
+            .tabItem {
+                Image(systemName: "bubble.left.and.bubble.right.fill")
+                Text("Asistente")
+            }
         }
         .onChange(of: expenseViewModel.expenses) { _ in
             checkBudgetAlerts()
