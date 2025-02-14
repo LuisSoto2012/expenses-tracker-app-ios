@@ -1,7 +1,9 @@
 import SwiftUI
+import MarkdownUI
 
 struct AIAssistantView: View {
     @StateObject private var viewModel: AIAssistantViewModel
+    @State private var isLoading = true
     
     init(
         expenseViewModel: ExpenseViewModel,
@@ -18,76 +20,90 @@ struct AIAssistantView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Chat Messages
-            ScrollView {
-                LazyVStack(spacing: 12) {
-                    ForEach(viewModel.messages) { message in
-                        MessageBubble(message: message)
-                    }
-                    
-                    if viewModel.isTyping {
-                        TypingIndicator()
-                    }
-                }
-                .padding()
-            }
-            
-            // Input Area
-            VStack(spacing: 12) {
-                // Quick Suggestions
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(QuickSuggestion.allCases, id: \.self) { suggestion in
-                            Button(action: {
-                                viewModel.inputMessage = suggestion.rawValue
-                                viewModel.sendMessage()
-                            }) {
-                                Text(suggestion.rawValue)
-                                    .font(.footnote)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 8)
-                                    .background(Color.blue.opacity(0.1))
-                                    .foregroundColor(.blue)
-                                    .cornerRadius(16)
-                            }
+        ZStack {
+            VStack(spacing: 0) {
+                // Chat Messages
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        ForEach(viewModel.messages) { message in
+                            MessageBubble(message: message)
+                        }
+                        
+                        if viewModel.isTyping {
+                            TypingIndicator()
                         }
                     }
-                    .padding(.horizontal)
+                    .padding()
                 }
                 
-                Divider()
-                
-                HStack {
-                    TextField("Escribe tu pregunta...", text: $viewModel.inputMessage)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .disabled(viewModel.isTyping)
-                    
-                    Button(action: viewModel.sendMessage) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 24))
+                // Input Area
+                VStack(spacing: 12) {
+                    // Quick Suggestions
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(QuickSuggestion.allCases, id: \.self) { suggestion in
+                                Button(action: {
+                                    viewModel.inputMessage = suggestion.rawValue
+                                    viewModel.sendMessage()
+                                }) {
+                                    Text(suggestion.rawValue)
+                                        .font(.footnote)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color.blue.opacity(0.1))
+                                        .foregroundColor(.blue)
+                                        .cornerRadius(16)
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
                     }
-                    .disabled(viewModel.inputMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isTyping)
+                    
+                    Divider()
+                    
+                    HStack {
+                        TextField("Escribe tu pregunta...", text: $viewModel.inputMessage)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .disabled(viewModel.isTyping)
+                        
+                        Button(action: viewModel.sendMessage) {
+                            Image(systemName: "arrow.up.circle.fill")
+                                .font(.system(size: 24))
+                        }
+                        .disabled(viewModel.inputMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isTyping)
+                    }
+                    .padding()
                 }
-                .padding()
+                .background(Color(.systemBackground))
             }
-            .background(Color(.systemBackground))
+            .navigationTitle("Asistente Financiero")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(action: viewModel.clearChat) {
+                            Label("Limpiar Chat", systemImage: "trash")
+                        }
+                        
+                        Button(action: viewModel.requestFinancialReport) {
+                            Label("Generar Reporte", systemImage: "doc.text.fill")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                }
+            }
+            
+            if isLoading {
+                ProgressView("Cargando mensajes...")
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(10)
+                    .shadow(radius: 10)
+            }
         }
-        .navigationTitle("Asistente Financiero")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button(action: viewModel.clearChat) {
-                        Label("Limpiar Chat", systemImage: "trash")
-                    }
-                    
-                    Button(action: viewModel.requestFinancialReport) {
-                        Label("Generar Reporte", systemImage: "doc.text.fill")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-            }
+        .task {
+            await viewModel.initialLoad()
+            isLoading = false
         }
     }
 }
@@ -104,7 +120,7 @@ struct MessageBubble: View {
                     .frame(width: 32, height: 32)
             }
             
-            Text(message.content)
+            Markdown(message.content)
                 .padding(12)
                 .background(message.isFromUser ? Color.blue : Color(.systemGray6))
                 .foregroundColor(message.isFromUser ? .white : .primary)

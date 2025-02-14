@@ -6,17 +6,50 @@ class AIAssistantViewModel: ObservableObject {
     @Published var inputMessage: String = ""
     @Published var isTyping: Bool = false
     
-    private let openAIService = OpenAIService()
+    private let openAIService: OpenAIService
+    private let chatService: ChatService
     private let expenseViewModel: ExpenseViewModel
     private let incomeViewModel: IncomeViewModel
     private let accountViewModel: AccountViewModel
     private let debtViewModel: DebtViewModel
     
-    init(expenseViewModel: ExpenseViewModel, incomeViewModel: IncomeViewModel, accountViewModel: AccountViewModel, debtViewModel: DebtViewModel) {
+    // UserDefaults keys
+    private let messagesKey = "ai_chat_messages"
+    private let tokensUsedKey = "ai_tokens_used"
+    
+    init(
+        expenseViewModel: ExpenseViewModel,
+        incomeViewModel: IncomeViewModel,
+        accountViewModel: AccountViewModel,
+        debtViewModel: DebtViewModel
+    ) {
+        self.openAIService = OpenAIService()
+        self.chatService = ChatService()
         self.expenseViewModel = expenseViewModel
         self.incomeViewModel = incomeViewModel
         self.accountViewModel = accountViewModel
         self.debtViewModel = debtViewModel
+    }
+    
+    @MainActor
+    func initialLoad() async {
+        do {
+            let loadedMessages = try await chatService.loadMessages()
+            messages = loadedMessages
+            
+            // Cargar tokens usados
+            let tokensUsed = loadedMessages.reduce(0) { $0 + $1.tokensUsed }
+            openAIService.totalTokensUsed = tokensUsed
+        } catch {
+            print("Error loading messages: \(error)")
+        }
+    }
+    
+    private func saveMessages() {
+        if let encoded = try? JSONEncoder().encode(messages) {
+            UserDefaults.standard.set(encoded, forKey: messagesKey)
+        }
+        UserDefaults.standard.set(openAIService.totalTokensUsed, forKey: tokensUsedKey)
     }
     
     func sendMessage() {
@@ -24,41 +57,60 @@ class AIAssistantViewModel: ObservableObject {
         
         let userMessage = Message(content: inputMessage, isFromUser: true)
         messages.append(userMessage)
-        
-        let userInput = inputMessage
         inputMessage = ""
+        isTyping = true
         
+        // Guardar mensaje del usuario
         Task {
-            isTyping = true
+            try? await chatService.saveMessage(userMessage)
             
             do {
-                // Preparar datos relevantes del usuario
                 let userData = prepareUserData()
-                
-                // Obtener respuesta de OpenAI
-                let response = try await openAIService.generateResponse(
+                let (response, tokensUsed) = try await openAIService.generateResponse(
                     messages: messages,
                     userData: userData
                 )
                 
                 await MainActor.run {
-                    messages.append(Message(content: response, isFromUser: false))
+                    let assistantMessage = Message(
+                        content: response,
+                        isFromUser: false,
+                        tokensUsed: tokensUsed
+                    )
+                    messages.append(assistantMessage)
                     isTyping = false
+                    
+                    // Guardar mensaje del asistente
+                    Task {
+                        try? await chatService.saveMessage(assistantMessage)
+                    }
                 }
             } catch {
                 await MainActor.run {
-                    messages.append(Message(
-                        content: "Lo siento, hubo un error al procesar tu pregunta.",
+                    let errorMessage = Message(
+                        content: "Lo siento, hubo un error al procesar tu mensaje.",
                         isFromUser: false
-                    ))
+                    )
+                    messages.append(errorMessage)
                     isTyping = false
+                    
+                    // Guardar mensaje de error
+                    Task {
+                        try? await chatService.saveMessage(errorMessage)
+                    }
                 }
             }
         }
     }
     
     func clearChat() {
-        messages.removeAll()
+        Task {
+            try? await chatService.clearChat()
+            await MainActor.run {
+                messages.removeAll()
+            }
+        }
+        saveMessages()
     }
     
     private func prepareUserData() -> [String: Any] {

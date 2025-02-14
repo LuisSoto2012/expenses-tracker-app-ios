@@ -1,15 +1,37 @@
 import Foundation
 
-class OpenAIService {
+class OpenAIService: ObservableObject {
     private let apiKey: String
     private let baseURL = "https://api.openai.com/v1/chat/completions"
+    private let chatService: ChatService
+    
+    @Published var totalTokensUsed: Int = 0
+    
+    struct OpenAIResponse: Codable {
+        let id: String
+        let choices: [Choice]
+        let usage: Usage
+        
+        struct Usage: Codable {
+            let promptTokens: Int
+            let completionTokens: Int
+            let totalTokens: Int
+            
+            enum CodingKeys: String, CodingKey {
+                case promptTokens = "prompt_tokens"
+                case completionTokens = "completion_tokens"
+                case totalTokens = "total_tokens"
+            }
+        }
+    }
     
     init() {
         // En producción, esto debería obtenerse de forma segura
         self.apiKey = "API_KEY"
+        self.chatService = ChatService()
     }
     
-    func generateResponse(messages: [Message], userData: [String: Any]) async throws -> String {
+    func generateResponse(messages: [Message], userData: [String: Any]) async throws -> (content: String, tokensUsed: Int) {
         var requestMessages: [[String: Any]] = []
         
         // Sistema prompt mejorado para reportes financieros
@@ -115,7 +137,7 @@ class OpenAIService {
         }
         
         let requestBody: [String: Any] = [
-            "model": "gpt-3.5-turbo",
+            "model": "gpt-4o-2024-08-06",
             "messages": requestMessages,
             "temperature": 0.7
         ]
@@ -129,12 +151,19 @@ class OpenAIService {
         let (data, _) = try await URLSession.shared.data(for: request)
         let response = try JSONDecoder().decode(OpenAIResponse.self, from: data)
         
-        return response.choices.first?.message.content ?? "Lo siento, no pude procesar tu pregunta."
+        // Actualizar el total de tokens usados
+        totalTokensUsed += response.usage.totalTokens
+        
+        return (
+            content: response.choices.first?.message.content ?? "Lo siento, no pude procesar tu pregunta.",
+            tokensUsed: response.usage.totalTokens
+        )
     }
-}
-
-struct OpenAIResponse: Codable {
-    let choices: [Choice]
+    
+    func fetchCreditBalance() async throws {
+        // Obtener el total de tokens usados de los mensajes del asistente
+        totalTokensUsed = try await chatService.getTotalTokensUsed()
+    }
 }
 
 struct Choice: Codable {

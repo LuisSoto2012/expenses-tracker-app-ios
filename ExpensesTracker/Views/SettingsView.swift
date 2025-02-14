@@ -15,6 +15,9 @@ struct SettingsView: View {
     @State private var successMessage = ""
     
     @StateObject private var firebaseService = FirebaseService.shared
+    @StateObject private var openAIService = OpenAIService()
+    @State private var isLoadingBalance = false
+    @State private var balanceError: String?
     
     // Mapeo de nombres en español a inglés
     let spanishToEnglishMap: [String: String] = [
@@ -82,6 +85,50 @@ struct SettingsView: View {
                            Image(systemName: "square.and.arrow.up")
                        }
                    }
+               }
+               
+               // OpenAI API
+               Section("OpenAI API") {
+                   VStack(alignment: .leading, spacing: 12) {
+                       Text("Uso de Tokens")
+                           .font(.headline)
+                       
+                       VStack(alignment: .leading, spacing: 8) {
+                           // Tokens Disponibles
+                           VStack(alignment: .leading, spacing: 4) {
+                               HStack {
+                                   Text("Tokens Disponibles:")
+                                   Spacer()
+                                   Text("\(2_000_000 - openAIService.totalTokensUsed)")
+                                       .bold()
+                               }
+                               ProgressView(value: Double(openAIService.totalTokensUsed), total: 2_000_000)
+                                   .tint(.green)
+                           }
+                           
+                           // Tokens Usados
+                           VStack(alignment: .leading, spacing: 4) {
+                               HStack {
+                                   Text("Tokens Usados:")
+                                   Spacer()
+                                   Text("\(openAIService.totalTokensUsed)")
+                                       .bold()
+                               }
+                               ProgressView(value: Double(openAIService.totalTokensUsed), total: 2_000_000)
+                                   .tint(.orange)
+                           }
+                           
+                           // Total de Tokens
+                           HStack {
+                               Text("Total de Tokens:")
+                               Spacer()
+                               Text("2,000,000")
+                                   .bold()
+                           }
+                       }
+                       .padding(.vertical, 4)
+                   }
+                   .padding(.vertical, 4)
                }
                
                // Account Section
@@ -170,6 +217,9 @@ struct SettingsView: View {
         } message: {
             Text("¿Estás seguro de que deseas cerrar sesión?")
         }
+        .onAppear {
+            refreshBalance()
+        }
     }
     
     private func deleteAllData() {
@@ -189,6 +239,20 @@ struct SettingsView: View {
         if let spanishName = spanishToEnglishMap.first(where: { $0.value == type })?.key {
             successMessage = "Los datos de \(spanishName) han sido eliminados exitosamente."
             showingSuccessMessage = true
+        }
+    }
+    
+    private func refreshBalance() {
+        isLoadingBalance = true
+        balanceError = nil
+        
+        Task {
+            do {
+                _ = try await openAIService.fetchCreditBalance()
+            } catch {
+                balanceError = "Error al cargar el saldo: \(error.localizedDescription)"
+            }
+            isLoadingBalance = false
         }
     }
 }
