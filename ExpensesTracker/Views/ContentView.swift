@@ -37,18 +37,6 @@ struct ContentView: View {
                     Label("Deudas", systemImage: "creditcard.fill") // Translated text
                 }
             
-            DashboardView()
-                .environmentObject(expenseViewModel)
-                .tabItem {
-                    Label("Estadísticas", systemImage: "chart.pie.fill") // Translated text
-                }
-            
-            SettingsView()
-                .environmentObject(expenseViewModel)
-                .tabItem {
-                    Label("Configuración", systemImage: "gear") // Translated text
-                }
-            
             NavigationView {
                 AIAssistantView(
                     expenseViewModel: expenseViewModel,
@@ -58,9 +46,14 @@ struct ContentView: View {
                 )
             }
             .tabItem {
-                Image(systemName: "bubble.left.and.bubble.right.fill")
-                Text("Asistente")
+                Label("Asistente", systemImage: "bubble.left.and.bubble.right.fill")
             }
+            
+            SettingsView()
+                .environmentObject(expenseViewModel)
+                .tabItem {
+                    Label("Configuración", systemImage: "gear") // Translated text
+                }
         }
         .onChange(of: expenseViewModel.expenses) { _ in
             checkBudgetAlerts()

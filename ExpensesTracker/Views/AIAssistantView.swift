@@ -34,7 +34,28 @@ struct AIAssistantView: View {
             }
             
             // Input Area
-            VStack(spacing: 0) {
+            VStack(spacing: 12) {
+                // Quick Suggestions
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(QuickSuggestion.allCases, id: \.self) { suggestion in
+                            Button(action: {
+                                viewModel.inputMessage = suggestion.rawValue
+                                viewModel.sendMessage()
+                            }) {
+                                Text(suggestion.rawValue)
+                                    .font(.footnote)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(Color.blue.opacity(0.1))
+                                    .foregroundColor(.blue)
+                                    .cornerRadius(16)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                
                 Divider()
                 
                 HStack {
@@ -75,8 +96,13 @@ struct MessageBubble: View {
     let message: Message
     
     var body: some View {
-        HStack {
-            if message.isFromUser { Spacer() }
+        HStack(alignment: .bottom, spacing: 8) {
+            if !message.isFromUser {
+                Image(systemName: "brain.head.profile")
+                    .foregroundColor(.blue)
+                    .font(.system(size: 24))
+                    .frame(width: 32, height: 32)
+            }
             
             Text(message.content)
                 .padding(12)
@@ -85,7 +111,12 @@ struct MessageBubble: View {
                 .cornerRadius(16)
                 .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: message.isFromUser ? .trailing : .leading)
             
-            if !message.isFromUser { Spacer() }
+            if message.isFromUser {
+                Image(systemName: "person.circle.fill")
+                    .foregroundColor(.blue)
+                    .font(.system(size: 24))
+                    .frame(width: 32, height: 32)
+            }
         }
     }
 }
@@ -109,4 +140,12 @@ struct TypingIndicator: View {
             RunLoop.current.add(timer, forMode: .common)
         }
     }
+}
+
+enum QuickSuggestion: String, CaseIterable {
+    case expenseSummary = "Resumen de gastos"
+    case savingTips = "Tips de ahorro"
+    case budgetAnalysis = "Análisis de presupuesto"
+    case debtAdvice = "Consejos sobre deudas"
+    case incomeAnalysis = "Análisis de ingresos"
 } 
