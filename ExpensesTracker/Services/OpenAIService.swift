@@ -6,7 +6,7 @@ class OpenAIService {
     
     init() {
         // En producción, esto debería obtenerse de forma segura
-        self.apiKey = "MY_API_KEY"
+        self.apiKey = "API_KEY"
     }
     
     func generateResponse(messages: [Message], userData: [String: Any]) async throws -> String {
@@ -59,17 +59,16 @@ class OpenAIService {
         ## Directrices para Respuestas:
         1. Siempre fundamenta tus respuestas con datos específicos.
         2. Usa formato Markdown para mejor legibilidad.
-        3. Estructura la información en secciones claras:
-           - **Datos Relevantes**
-           - **Análisis**
-           - **Recomendación**
+        3. Estructura la información en secciones claras **solo cuando sea necesario**:
+           - Usa el formato **Datos Relevantes → Análisis → Recomendación** solo si la consulta requiere una estructura detallada.
+           - Si la respuesta puede darse de manera más natural o conversacional, prescinde de la estructura y responde de forma directa.
         4. Incluye porcentajes y comparativas cuando sea posible.
         5. Sé específico con las cantidades de dinero (usa separadores de miles y decimales).
         6. Considera el contexto completo (ingresos, gastos, deudas).
         7. Proporciona consejos accionables.
         8. Alerta sobre riesgos potenciales.
-        9. Mantén un tono profesional pero amigable.
-
+        9. Mantén un tono profesional pero amigable y accesible.
+        
         ## Formato de Respuesta para Consultas Específicas:
 
         **Ejemplo de Respuesta:**
