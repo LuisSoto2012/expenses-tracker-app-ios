@@ -11,6 +11,7 @@ struct ContentView: View {
     @StateObject var expenseViewModel: ExpenseViewModel
     @StateObject var incomeViewModel: IncomeViewModel
     @StateObject var accountViewModel: AccountViewModel
+    @StateObject var debtViewModel: DebtViewModel
     @State private var showingBudgetAlert = false
     @State private var budgetAlertCategory: Category?
     
@@ -49,7 +50,12 @@ struct ContentView: View {
                 }
             
             NavigationView {
-                AIAssistantView(expenseViewModel: expenseViewModel)
+                AIAssistantView(
+                    expenseViewModel: expenseViewModel,
+                    incomeViewModel: incomeViewModel,
+                    accountViewModel: accountViewModel,
+                    debtViewModel: debtViewModel
+                )
             }
             .tabItem {
                 Image(systemName: "bubble.left.and.bubble.right.fill")

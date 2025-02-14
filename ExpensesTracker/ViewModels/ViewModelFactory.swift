@@ -16,4 +16,8 @@ class ViewModelFactory {
     lazy var incomeViewModel: IncomeViewModel = {
         return IncomeViewModel()
     }()
-} 
+    
+    lazy var debtViewModel: DebtViewModel = {
+        return DebtViewModel()
+    }()
+}

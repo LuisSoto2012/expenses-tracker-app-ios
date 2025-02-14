@@ -3,8 +3,18 @@ import SwiftUI
 struct AIAssistantView: View {
     @StateObject private var viewModel: AIAssistantViewModel
     
-    init(expenseViewModel: ExpenseViewModel) {
-        _viewModel = StateObject(wrappedValue: AIAssistantViewModel(expenseViewModel: expenseViewModel))
+    init(
+        expenseViewModel: ExpenseViewModel,
+        incomeViewModel: IncomeViewModel,
+        accountViewModel: AccountViewModel,
+        debtViewModel: DebtViewModel
+    ) {
+        _viewModel = StateObject(wrappedValue: AIAssistantViewModel(
+            expenseViewModel: expenseViewModel,
+            incomeViewModel: incomeViewModel,
+            accountViewModel: accountViewModel,
+            debtViewModel: debtViewModel
+        ))
     }
     
     var body: some View {
@@ -45,8 +55,16 @@ struct AIAssistantView: View {
         .navigationTitle("Asistente Financiero")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: viewModel.clearChat) {
-                    Image(systemName: "trash")
+                Menu {
+                    Button(action: viewModel.clearChat) {
+                        Label("Limpiar Chat", systemImage: "trash")
+                    }
+                    
+                    Button(action: viewModel.requestFinancialReport) {
+                        Label("Generar Reporte", systemImage: "doc.text.fill")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
                 }
             }
         }
