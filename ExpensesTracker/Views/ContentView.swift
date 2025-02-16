@@ -11,6 +11,7 @@ struct ContentView: View {
     @StateObject var expenseViewModel: ExpenseViewModel
     @StateObject var incomeViewModel: IncomeViewModel
     @StateObject var accountViewModel: AccountViewModel
+    @StateObject var debtViewModel: DebtViewModel
     @State private var showingBudgetAlert = false
     @State private var budgetAlertCategory: Category?
     
@@ -36,11 +37,17 @@ struct ContentView: View {
                     Label("Deudas", systemImage: "creditcard.fill") // Translated text
                 }
             
-            DashboardView()
-                .environmentObject(expenseViewModel)
-                .tabItem {
-                    Label("Estadísticas", systemImage: "chart.pie.fill") // Translated text
-                }
+            NavigationView {
+                AIAssistantView(
+                    expenseViewModel: expenseViewModel,
+                    incomeViewModel: incomeViewModel,
+                    accountViewModel: accountViewModel,
+                    debtViewModel: debtViewModel
+                )
+            }
+            .tabItem {
+                Label("Asistente", systemImage: "bubble.left.and.bubble.right.fill")
+            }
             
             SettingsView()
                 .environmentObject(expenseViewModel)

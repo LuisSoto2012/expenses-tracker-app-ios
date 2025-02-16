@@ -17,6 +17,7 @@ struct ExpensesTrackerApp: App {
     @StateObject private var accountViewModel: AccountViewModel
     @StateObject private var expenseViewModel: ExpenseViewModel
     @StateObject private var incomeViewModel: IncomeViewModel
+    @StateObject private var debtViewModel: DebtViewModel
     
     init() {
         // Configure Firebase with custom plist for the test environment
@@ -33,6 +34,7 @@ struct ExpensesTrackerApp: App {
         _accountViewModel = StateObject(wrappedValue: factory.accountViewModel)
         _expenseViewModel = StateObject(wrappedValue: factory.expenseViewModel)
         _incomeViewModel = StateObject(wrappedValue: factory.incomeViewModel)
+        _debtViewModel = StateObject(wrappedValue: factory.debtViewModel)
         
         // Configurar el AppDelegate con el ExpenseViewModel
         appDelegate.configure(with: expenseViewModel)
@@ -43,7 +45,8 @@ struct ExpensesTrackerApp: App {
             ContentView(
                 expenseViewModel: expenseViewModel,
                 incomeViewModel: incomeViewModel,
-                accountViewModel: accountViewModel
+                accountViewModel: accountViewModel,
+                debtViewModel: debtViewModel
             )
             .environmentObject(expenseViewModel)
             .environmentObject(accountViewModel)

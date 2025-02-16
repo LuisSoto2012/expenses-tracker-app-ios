@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-@MainActor
+//@MainActor
 class DebtViewModel: ObservableObject {
     private let firebaseService: FirebaseService
     

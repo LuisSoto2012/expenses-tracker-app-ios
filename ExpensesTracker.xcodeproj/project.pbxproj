@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6B273A762D5FD43100531624 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 6B273A752D5FD43100531624 /* MarkdownUI */; };
+		6B273A782D5FD43900531624 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 6B273A772D5FD43900531624 /* MarkdownUI */; };
 		6B5E3A242D40D3E300B87A2E /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 6B5E3A232D40D3E300B87A2E /* SFSymbolsPicker */; };
 		6B7183802D3A4541004C6DEA /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6B71837F2D3A4541004C6DEA /* FirebaseAuth */; };
 		6B7183822D3A4541004C6DEA /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6B7183812D3A4541004C6DEA /* FirebaseCore */; };
@@ -83,6 +85,7 @@
 				6B7183842D3A4541004C6DEA /* FirebaseDatabase in Frameworks */,
 				6B7183862D3A4541004C6DEA /* FirebaseFirestore in Frameworks */,
 				6B5E3A242D40D3E300B87A2E /* SFSymbolsPicker in Frameworks */,
+				6B273A762D5FD43100531624 /* MarkdownUI in Frameworks */,
 				6B7CBB982D434A5100376011 /* ConfettiView in Frameworks */,
 				6B7183822D3A4541004C6DEA /* FirebaseCore in Frameworks */,
 				6B7183882D3A4541004C6DEA /* FirebaseFirestoreCombine-Community in Frameworks */,
@@ -118,6 +121,7 @@
 				6BDDFA5D2D549ACE00786630 /* FirebaseFirestoreCombine-Community in Frameworks */,
 				6BDDFA5E2D549ACE00786630 /* FirebaseAuth in Frameworks */,
 				6BDDFA5F2D549ACE00786630 /* FirebaseStorage in Frameworks */,
+				6B273A782D5FD43900531624 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,6 +188,7 @@
 				6B7183892D3A4541004C6DEA /* FirebaseStorage */,
 				6B5E3A232D40D3E300B87A2E /* SFSymbolsPicker */,
 				6B7CBB972D434A5100376011 /* ConfettiView */,
+				6B273A752D5FD43100531624 /* MarkdownUI */,
 			);
 			productName = ExpensesTracker;
 			productReference = 6B7183242D3A3F4D004C6DEA /* ExpensesTracker.app */;
@@ -260,6 +265,7 @@
 				6BDDFA512D549ACE00786630 /* FirebaseStorage */,
 				6BDDFA522D549ACE00786630 /* SFSymbolsPicker */,
 				6BDDFA542D549ACE00786630 /* ConfettiView */,
+				6B273A772D5FD43900531624 /* MarkdownUI */,
 			);
 			productName = ExpensesTracker;
 			productReference = 6BDDFA652D549ACE00786630 /* ExpensesTracker Test.app */;
@@ -301,6 +307,7 @@
 				6B71837E2D3A4541004C6DEA /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				6B5E3A212D40D2FB00B87A2E /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */,
 				6B7CBB962D4349AE00376011 /* XCRemoteSwiftPackageReference "ConfettiView" */,
+				6B273A742D5FD41900531624 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6B7183252D3A3F4D004C6DEA /* Products */;
@@ -757,6 +764,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		6B273A742D5FD41900531624 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
 		6B5E3A212D40D2FB00B87A2E /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/alessiorubicini/SFSymbolsPicker";
@@ -808,6 +823,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6B273A752D5FD43100531624 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B273A742D5FD41900531624 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
+		6B273A772D5FD43900531624 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6B273A742D5FD41900531624 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
 		6B5E3A232D40D3E300B87A2E /* SFSymbolsPicker */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 6B5E3A212D40D2FB00B87A2E /* XCRemoteSwiftPackageReference "SFSymbolsPicker" */;
